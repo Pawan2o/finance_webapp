@@ -89,23 +89,8 @@ export function Users() {
       
       setUsers(filteredUsers);
       
-      // For total count, we need to get all users and filter them
-      // This is a workaround since the API might not support is_superuser filter properly
-      if (page === 1 && !search) {
-        // Fetch all users to get accurate count (only on first page without search)
-        try {
-          const allUsersRes = await apiRequest(`${config.api.host}${config.api.user}?page_size=1000`);
-          const allUsersData: UsersResponse = await allUsersRes.json();
-          const allFilteredUsers = (allUsersData.results || []).filter(user => !user.is_superuser);
-          setTotalCount(allFilteredUsers.length);
-        } catch {
-          // Fallback to filtered current page count if all users fetch fails
-          setTotalCount(filteredUsers.length);
-        }
-      } else {
-        // For other pages or search, estimate based on current results
-        setTotalCount(Math.max(totalCount, (page - 1) * PAGE_SIZE + filteredUsers.length));
-      }
+      // Use backend-provided count; fall back to estimating from current page
+      setTotalCount(data.count ?? Math.max(totalCount, (page - 1) * PAGE_SIZE + filteredUsers.length));
     } catch (error) {
       console.error('Failed to fetch users:', error);
       setError('Failed to load users');
@@ -294,8 +279,10 @@ export function Users() {
         </div>
 
         {/* Users Table */}
-        <div className="overflow-x-auto">
-          <table className="w-full">
+        <div className="relative overflow-x-auto scrollbar-soft">
+          {/* Fade hint so mobile users know the table scrolls horizontally */}
+          <div className="pointer-events-none absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-white to-transparent md:hidden" aria-hidden="true" />
+          <table className="w-full min-w-[640px]">
             <thead className="bg-gray-50 border-b">
               <tr>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Name</th>
@@ -322,14 +309,26 @@ export function Users() {
                   </td>
                   <td className="px-6 py-4 text-sm">
                     <div className="flex items-center gap-2">
-                      <button onClick={() => handleEdit(user)} className="text-blue-600 hover:text-blue-800" title="Edit">
-                        <Edit className="w-4 h-4" />
+                      <button
+                        onClick={() => handleEdit(user)}
+                        className="text-blue-600 hover:text-blue-800"
+                        aria-label={`Edit ${user.first_name} ${user.last_name}`}
+                      >
+                        <Edit className="w-4 h-4" aria-hidden="true" />
                       </button>
-                      <button onClick={() => handleDelete(user.id)} className="text-red-600 hover:text-red-800" title="Delete">
-                        <Trash2 className="w-4 h-4" />
+                      <button
+                        onClick={() => handleDelete(user.id)}
+                        className="text-red-600 hover:text-red-800"
+                        aria-label={`Delete ${user.first_name} ${user.last_name}`}
+                      >
+                        <Trash2 className="w-4 h-4" aria-hidden="true" />
                       </button>
-                      <button onClick={() => openPermanentDeleteModal(user)} className="text-red-800 hover:text-red-900" title="Permanent Delete">
-                        <AlertTriangle className="w-4 h-4" />
+                      <button
+                        onClick={() => openPermanentDeleteModal(user)}
+                        className="text-red-800 hover:text-red-900"
+                        aria-label={`Permanently delete ${user.first_name} ${user.last_name}`}
+                      >
+                        <AlertTriangle className="w-4 h-4" aria-hidden="true" />
                       </button>
                     </div>
                   </td>
@@ -349,19 +348,21 @@ export function Users() {
               <button
                 onClick={() => setCurrentPage(p => p - 1)}
                 disabled={currentPage === 1}
-                className="px-3 py-2 border rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-white transition-colors"
+                aria-label="Previous page"
+                className="px-3 py-2 border rounded-lg disabled:opacity-40 disabled:cursor-not-allowed disabled:bg-gray-100 hover:bg-white transition-colors"
               >
-                <ChevronLeft className="w-4 h-4" />
+                <ChevronLeft className="w-4 h-4" aria-hidden="true" />
               </button>
-              <span className="px-4 py-2 bg-white border rounded-lg font-medium">
+              <span className="px-4 py-2 bg-white border rounded-lg font-medium" aria-live="polite" aria-atomic="true">
                 {currentPage} of {Math.ceil(totalCount / PAGE_SIZE)}
               </span>
               <button
                 onClick={() => setCurrentPage(p => p + 1)}
                 disabled={currentPage >= Math.ceil(totalCount / PAGE_SIZE)}
-                className="px-3 py-2 border rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-white transition-colors"
+                aria-label="Next page"
+                className="px-3 py-2 border rounded-lg disabled:opacity-40 disabled:cursor-not-allowed disabled:bg-gray-100 hover:bg-white transition-colors"
               >
-                <ChevronRight className="w-4 h-4" />
+                <ChevronRight className="w-4 h-4" aria-hidden="true" />
               </button>
             </div>
           </div>
@@ -428,15 +429,15 @@ export function Users() {
           <div className="bg-white rounded-xl p-6 max-w-md w-full mx-4" onClick={(e) => e.stopPropagation()}>
             <div className="flex justify-between items-center mb-4">
               <h3 className={uiTheme.text.modalTitle}>{editingUser ? 'Edit User' : 'Add User'}</h3>
-              <button onClick={handleCloseModal}>
-                <X className="w-5 h-5 text-gray-500" />
+              <button onClick={handleCloseModal} aria-label="Close modal">
+                <X className="w-5 h-5 text-gray-500" aria-hidden="true" />
               </button>
             </div>
             
             <form onSubmit={handleSubmit} className="space-y-4">
               {/* Error display */}
               {error && (
-                <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-red-600 text-sm">
+                <div role="alert" aria-live="assertive" className="p-3 bg-red-50 border border-red-200 rounded-lg text-red-600 text-sm">
                   {error}
                 </div>
               )}
@@ -468,10 +469,12 @@ export function Users() {
                   />
                   <button
                     type="button"
+                    aria-label={showPassword ? 'Hide password' : 'Show password'}
+                    aria-pressed={showPassword}
                     onClick={() => setShowPassword(!showPassword)}
                     className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
                   >
-                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    {showPassword ? <EyeOff className="w-4 h-4" aria-hidden="true" /> : <Eye className="w-4 h-4" aria-hidden="true" />}
                   </button>
                 </div>
               </div>

@@ -141,7 +141,11 @@ export function Login() {
             <form onSubmit={handleLogin} className="space-y-5">
 
               {error && (
-                <div className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600">
+                <div
+                  role="alert"
+                  aria-live="assertive"
+                  className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600"
+                >
                   {error}
                 </div>
               )}
@@ -178,13 +182,14 @@ export function Login() {
                   <button
                     type="button"
                     aria-label={showPassword ? "Hide password" : "Show password"}
+                    aria-pressed={showPassword}
                     onClick={() => setShowPassword((current) => !current)}
                     className="absolute inset-y-0 right-0 flex w-12 items-center justify-center text-slate-700 transition-colors hover:text-slate-900"
                   >
                     {showPassword ? (
-                      <EyeOff className="h-5 w-5" />
+                      <EyeOff className="h-5 w-5" aria-hidden="true" />
                     ) : (
-                      <Eye className="h-5 w-5" />
+                      <Eye className="h-5 w-5" aria-hidden="true" />
                     )}
                   </button>
                 </div>

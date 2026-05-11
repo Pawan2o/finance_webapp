@@ -1,5 +1,6 @@
-// Loader component - displays Payment Processing animation
+// Loader component - displays Rupee Coin animation
 import { useEffect, useRef } from 'react';
+import animationData from '../../assets/loading/Rupee Coin.json';
 
 // Props interface for Loader component
 interface LoaderProps {
@@ -17,19 +18,15 @@ export function Loader({ size = 250, className = '', fullScreen = false }: Loade
 
     const loadLottie = async () => {
       try {
-        // Dynamically import lottie-web to avoid SSR issues
         const lottie = (await import('lottie-web')).default;
-        
-        // Import the animation data
-        const animationData = await import('../../assets/loading/Rupee Coin.json');
-        
+
         if (containerRef.current) {
           animationInstance = lottie.loadAnimation({
             container: containerRef.current,
             renderer: 'svg',
             loop: true,
             autoplay: true,
-            animationData: animationData.default,
+            animationData,
           });
         }
       } catch (error) {

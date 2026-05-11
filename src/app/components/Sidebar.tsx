@@ -1,4 +1,5 @@
 // Sidebar component - navigation menu with collapsible functionality
+import { useEffect, useLayoutEffect, useRef } from 'react';
 import { useNavigate } from 'react-router';
 import {
   ChevronLeft,
@@ -7,6 +8,8 @@ import {
 import { cn } from '../components/ui/utils';
 import { navigationItems } from '../navigation';
 import { clearStoredAuth } from '../../utils/auth';
+
+const SIDEBAR_SCROLL_STORAGE_KEY = 'sidebar-navigation-scroll-top';
 
 // Props interface for Sidebar component
 interface SidebarProps {
@@ -19,6 +22,37 @@ interface SidebarProps {
 // Sidebar navigation component with collapsible menu
 export function Sidebar({ collapsed, onToggle, activeItem, onNavigate }: SidebarProps) {
   const navigate = useNavigate();
+  const navRef = useRef<HTMLElement | null>(null);
+
+  useLayoutEffect(() => {
+    const savedScrollTop = window.sessionStorage.getItem(SIDEBAR_SCROLL_STORAGE_KEY);
+    if (!navRef.current || !savedScrollTop) {
+      return;
+    }
+
+    navRef.current.scrollTop = Number(savedScrollTop);
+  }, []);
+
+  useEffect(() => {
+    const navElement = navRef.current;
+    if (!navElement) {
+      return;
+    }
+
+    const handleScroll = () => {
+      window.sessionStorage.setItem(
+        SIDEBAR_SCROLL_STORAGE_KEY,
+        String(navElement.scrollTop)
+      );
+    };
+
+    navElement.addEventListener('scroll', handleScroll);
+
+    return () => {
+      handleScroll();
+      navElement.removeEventListener('scroll', handleScroll);
+    };
+  }, []);
 
   // Handle navigation to a menu item
   const handleNavigation = (itemId: string) => {
@@ -29,16 +63,15 @@ export function Sidebar({ collapsed, onToggle, activeItem, onNavigate }: Sidebar
 
   // Handle logout - clear tokens and redirect to login
   const handleLogout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('refresh');
-    navigate('/');
+    clearStoredAuth();
+    navigate('/login');
   };
   
   return (
     <aside
       className={cn(
         'fixed left-0 top-0 z-40 flex h-dvh flex-col overflow-hidden border-r border-white/10 bg-[linear-gradient(180deg,#061226_0%,#0A1830_34%,#102448_100%)] text-white shadow-[28px_0_80px_rgba(2,6,23,0.34)] transition-all duration-300',
-        collapsed ? 'w-20' : 'w-60'
+        collapsed ? 'w-20' : 'w-72'
       )}
     >
       <div className="pointer-events-none absolute inset-0">
@@ -79,8 +112,8 @@ export function Sidebar({ collapsed, onToggle, activeItem, onNavigate }: Sidebar
       </div>
 
       {/* Navigation Items */}
-      <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
-        {menuItems.map((item) => {
+      <nav ref={navRef} className="flex-1 px-3 py-4 space-y-1 overflow-y-auto scrollbar-none">
+        {navigationItems.map((item) => {
           const Icon = item.icon;
           const isActive = activeItem === item.id;
 
@@ -94,7 +127,7 @@ export function Sidebar({ collapsed, onToggle, activeItem, onNavigate }: Sidebar
                 collapsed ? 'justify-center px-0 py-2.5' : 'gap-3 px-3 py-3',
                 isActive
                   ? 'bg-[linear-gradient(135deg,rgba(66,104,224,0.95)_0%,rgba(102,144,247,0.95)_100%)] text-white shadow-[0_14px_30px_rgba(66,104,224,0.35)]'
-                  : 'text-blue-100/72 hover:bg-white/10 hover:text-white'
+                  : 'text-blue-50/90 hover:bg-white/10 hover:text-white'
               )}
             >
               <div

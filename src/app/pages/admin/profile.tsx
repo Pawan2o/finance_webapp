@@ -242,13 +242,13 @@ export function Profile() {
 
           {/* Messages */}
           {error && (
-            <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700">
+            <div role="alert" aria-live="assertive" className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700">
               {error}
             </div>
           )}
           
           {success && (
-            <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-lg text-green-700">
+            <div role="alert" aria-live="polite" className="mb-4 p-3 bg-green-50 border border-green-200 rounded-lg text-green-700">
               {success}
             </div>
           )}
