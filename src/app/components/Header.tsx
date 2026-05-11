@@ -1,6 +1,7 @@
 // Header component - displays page title, search bar, notifications, and user profile
 import { Search, Bell, ChevronDown, User, Settings as SettingsIcon, LogOut, Menu } from 'lucide-react';
 import { useNavigate } from 'react-router';
+import { clearStoredAuth } from '../../utils/auth';
 
 // Props interface for Header component
 interface HeaderProps {
@@ -15,8 +16,7 @@ export function Header({ pageTitle, onMenuClick, onSearch, searchPlaceholder }: 
   const navigate = useNavigate();
 
   const handleLogout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('refresh');
+    clearStoredAuth();
     navigate('/');
   };
 

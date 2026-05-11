@@ -1,5 +1,6 @@
 // API utility for making authenticated HTTP requests with token refresh
 import config from '../config/global.json';
+import { redirectToLogin } from './auth';
 
 // Makes API requests with automatic token refresh on 401 errors
 export const apiRequest = async (url: string, options: RequestInit = {}) => {
@@ -39,18 +40,15 @@ export const apiRequest = async (url: string, options: RequestInit = {}) => {
           response = await fetch(url, { ...options, headers });
         } else {
           // Refresh failed - clear storage and redirect to login
-          localStorage.clear();
-          window.location.href = '/';
+          redirectToLogin();
         }
       } catch (error) {
         // Error during refresh - clear storage and redirect to login
-        localStorage.clear();
-        window.location.href = '/';
+        redirectToLogin();
       }
     } else {
       // No refresh token available - redirect to login
-      localStorage.clear();
-      window.location.href = '/';
+      redirectToLogin();
     }
   }
 

@@ -1,21 +1,12 @@
 // Sidebar component - navigation menu with collapsible functionality
 import { useNavigate } from 'react-router';
 import {
-  LayoutDashboard,
-  Users,
-  ArrowLeftRight,
-  FolderOpen,
-  FileType,
-  CreditCard,
-  Shield,
-  FileText,
-  Settings,
   ChevronLeft,
   LogOut,
-  Activity,
-  Brain,
 } from 'lucide-react';
 import { cn } from '../components/ui/utils';
+import { navigationItems } from '../navigation';
+import { clearStoredAuth } from '../../utils/auth';
 
 // Props interface for Sidebar component
 interface SidebarProps {
@@ -25,21 +16,6 @@ interface SidebarProps {
   onNavigate: (item: string) => void; // Callback when navigating to a menu item
 }
 
-// Menu items configuration with icons and labels
-const menuItems = [
-  { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
-  { id: 'users', label: 'Users', icon: Users },
-  { id: 'types', label: 'Types', icon: FileType },
-  { id: 'categories', label: 'Categories', icon: FolderOpen },
-  { id: 'payment-methods', label: 'Payment Methods', icon: CreditCard },
-  { id: 'roles', label: 'Roles & Permissions', icon: Shield },
-  { id: 'reports', label: 'Reports', icon: FileText },
-  { id: 'transactions', label: 'Transactions', icon: ArrowLeftRight },
-  { id: 'ai-questions', label: 'AI Questions', icon: Brain },
-  { id: 'audit-logs', label: 'Audit Logs', icon: Activity },
-  { id: 'settings', label: 'Settings', icon: Settings },
-];
-
 // Sidebar navigation component with collapsible menu
 export function Sidebar({ collapsed, onToggle, activeItem, onNavigate }: SidebarProps) {
   const navigate = useNavigate();
@@ -47,13 +23,13 @@ export function Sidebar({ collapsed, onToggle, activeItem, onNavigate }: Sidebar
   // Handle navigation to a menu item
   const handleNavigation = (itemId: string) => {
     onNavigate(itemId);
-    navigate(`/${itemId}`);
+    const target = navigationItems.find((item) => item.id === itemId);
+    navigate(target?.path ?? `/${itemId}`);
   };
 
   // Handle logout - clear tokens and redirect to login
   const handleLogout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('refresh');
+    clearStoredAuth();
     navigate('/');
   };
   
@@ -86,7 +62,7 @@ export function Sidebar({ collapsed, onToggle, activeItem, onNavigate }: Sidebar
 
       {/* Navigation Items */}
       <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
-        {menuItems.map((item) => {
+        {navigationItems.map((item) => {
           const Icon = item.icon;
           const isActive = activeItem === item.id;
 

@@ -4,6 +4,7 @@ import { Layout } from '../components/Layout';
 import { Users } from 'lucide-react';
 import { StatCard } from '../components/StatCard';
 import { Loader } from '../components/Loader';
+import { PageCard } from '../components/PageCard';
 import config from '../../config/global.json';
 
 // Dashboard component showing key statistics
@@ -26,7 +27,7 @@ export function Dashboard() {
         const usersData = await usersRes.json();
 
         // Filter out superusers from total count
-        const regularUsers = usersData.results ? usersData.results.filter(user => !user.is_superuser) : [];
+        const regularUsers = usersData.results ? usersData.results.filter((user: { is_superuser: boolean }) => !user.is_superuser) : [];
 
         // Update stats state
         setStats({
@@ -56,7 +57,7 @@ export function Dashboard() {
   return (
     <Layout pageTitle="Dashboard">
       {/* Statistics Grid */}
-      <div className="grid grid-cols-1 gap-4 md:gap-6">
+      <PageCard className="grid grid-cols-1 gap-4 md:gap-6">
         {/* Total Users Card */}
         <StatCard
           icon={Users}
@@ -66,7 +67,7 @@ export function Dashboard() {
           iconColor="#374151"
           iconBgColor="#F3F4F6"
         />
-      </div>
+      </PageCard>
     </Layout>
   );
 }
