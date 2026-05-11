@@ -63,7 +63,7 @@ export function Dashboard() {
   return (
     <Layout pageTitle="Dashboard">
       {/* Statistics Grid */}
-      <div className="grid grid-cols-1 gap-4 md:gap-6">
+      <PageCard className="grid grid-cols-1 gap-4 border-0 bg-transparent p-0 shadow-none backdrop-blur-none md:gap-6">
         {/* Total Users Card */}
         <StatCard
           icon={Users}
