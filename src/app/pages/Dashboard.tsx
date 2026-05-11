@@ -6,6 +6,7 @@ import { StatCard } from '../components/StatCard';
 import { Loader } from '../components/Loader';
 import { PageCard } from '../components/PageCard';
 import config from '../../config/global.json';
+import { getAuthToken, redirectToLogin } from '../../utils/auth';
 
 // Dashboard component showing key statistics
 export function Dashboard() {
@@ -18,8 +19,13 @@ export function Dashboard() {
   // Fetch dashboard statistics on component mount
   useEffect(() => {
     const fetchStats = async () => {
+      const token = getAuthToken();
+      if (!token) {
+        redirectToLogin();
+        return;
+      }
+
       try {
-        const token = localStorage.getItem('token');
         const headers = { 'Authorization': `Bearer ${token}` };
 
         // Fetch users data
@@ -57,7 +63,7 @@ export function Dashboard() {
   return (
     <Layout pageTitle="Dashboard">
       {/* Statistics Grid */}
-      <PageCard className="grid grid-cols-1 gap-4 md:gap-6">
+      <div className="grid grid-cols-1 gap-4 md:gap-6">
         {/* Total Users Card */}
         <StatCard
           icon={Users}

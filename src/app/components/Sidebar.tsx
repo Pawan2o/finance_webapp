@@ -29,31 +29,49 @@ export function Sidebar({ collapsed, onToggle, activeItem, onNavigate }: Sidebar
 
   // Handle logout - clear tokens and redirect to login
   const handleLogout = () => {
-    clearStoredAuth();
+    localStorage.removeItem('token');
+    localStorage.removeItem('refresh');
     navigate('/');
   };
   
   return (
     <aside
       className={cn(
-        'fixed left-0 top-0 h-screen bg-[#F9FAFB] border-r border-[#E5E7EB] transition-all duration-300 z-40 flex flex-col',
-        collapsed ? 'w-16' : 'w-60'
+        'fixed left-0 top-0 z-40 flex h-dvh flex-col overflow-hidden border-r border-white/10 bg-[linear-gradient(180deg,#061226_0%,#0A1830_34%,#102448_100%)] text-white shadow-[28px_0_80px_rgba(2,6,23,0.34)] transition-all duration-300',
+        collapsed ? 'w-20' : 'w-60'
       )}
     >
+      <div className="pointer-events-none absolute inset-0">
+        <div className="absolute -left-12 top-10 h-36 w-36 rounded-full bg-[radial-gradient(circle,_rgba(102,144,247,0.28),_transparent_70%)] blur-2xl" />
+        <div className="absolute bottom-16 right-[-24px] h-44 w-44 rounded-full bg-[radial-gradient(circle,_rgba(124,58,237,0.20),_transparent_72%)] blur-3xl" />
+      </div>
+
       {/* Logo Section */}
-      <div className="h-16 flex items-center justify-between px-4 border-b border-[#E5E7EB]">
+      <div
+        className={cn(
+          'relative flex h-20 items-center border-b border-white/10 px-4',
+          collapsed ? 'justify-center' : 'justify-between'
+        )}
+      >
         {/* Logo text - hidden when collapsed */}
         {!collapsed && (
-          <span className="font-semibold text-[#111827]">PaisaTrack</span>
+          <div>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-blue-200/70">Finance OS</p>
+            <span className="text-lg font-semibold text-white">PaisaTrack</span>
+          </div>
         )}
         {/* Toggle button to collapse/expand sidebar */}
         <button
           onClick={onToggle}
-          className="p-1.5 hover:bg-[#F3F4F6] rounded-lg transition-colors"
+          title={collapsed ? 'Expand menu' : 'Collapse menu'}
+          className={cn(
+            'rounded-2xl border border-white/10 bg-white/8 p-2 text-blue-100 transition-colors hover:bg-white/14',
+            collapsed && 'shadow-[0_12px_24px_rgba(66,104,224,0.22)]'
+          )}
         >
           <ChevronLeft
             className={cn(
-              'w-5 h-5 text-[#6B7280] transition-transform',
+              'h-5 w-5 transition-transform',
               collapsed && 'rotate-180'
             )}
           />
@@ -62,25 +80,34 @@ export function Sidebar({ collapsed, onToggle, activeItem, onNavigate }: Sidebar
 
       {/* Navigation Items */}
       <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
-        {navigationItems.map((item) => {
+        {menuItems.map((item) => {
           const Icon = item.icon;
           const isActive = activeItem === item.id;
 
           return (
             <button
               key={item.id}
+              title={item.label}
               onClick={() => handleNavigation(item.id)}
               className={cn(
-                'w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors group',
+                'group flex w-full items-center rounded-2xl transition-all',
+                collapsed ? 'justify-center px-0 py-2.5' : 'gap-3 px-3 py-3',
                 isActive
-                  ? 'bg-[#F3F4F6] text-[#111827]'
-                  : 'text-[#6B7280] hover:bg-[#F3F4F6] hover:text-[#111827]'
+                  ? 'bg-[linear-gradient(135deg,rgba(66,104,224,0.95)_0%,rgba(102,144,247,0.95)_100%)] text-white shadow-[0_14px_30px_rgba(66,104,224,0.35)]'
+                  : 'text-blue-100/72 hover:bg-white/10 hover:text-white'
               )}
             >
-              <Icon className="w-5 h-5 flex-shrink-0" />
+              <div
+                className={cn(
+                  'flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-2xl transition-colors',
+                  isActive ? 'bg-white/14' : 'bg-white/6 group-hover:bg-white/10'
+                )}
+              >
+                <Icon className="h-5 w-5 flex-shrink-0" />
+              </div>
               {/* Label - hidden when collapsed */}
               {!collapsed && (
-                <span className="text-sm font-medium truncate">{item.label}</span>
+                <span className="truncate text-sm font-medium">{item.label}</span>
               )}
             </button>
           );
@@ -88,28 +115,29 @@ export function Sidebar({ collapsed, onToggle, activeItem, onNavigate }: Sidebar
       </nav>
 
       {/* Admin Profile Section */}
-      <div className="p-3 border-t border-[#E5E7EB]">
+      <div className={cn('relative border-t border-white/10', collapsed ? 'p-2.5' : 'p-3')}>
         <div
           className={cn(
-            'flex items-center gap-3 p-2 rounded-lg hover:bg-[#F3F4F6] transition-colors',
-            collapsed && 'justify-center'
+            'flex items-center gap-3 rounded-2xl border border-white/10 bg-white/8 p-3 transition-colors hover:bg-white/12',
+            collapsed && 'justify-center px-0 py-2.5'
           )}
+          title={collapsed ? 'Admin profile' : undefined}
         >
           {/* Admin avatar */}
-          <div className="w-8 h-8 bg-[#374151] rounded-full flex items-center justify-center flex-shrink-0">
-            <span className="text-white text-sm font-medium">A</span>
+          <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-2xl bg-[linear-gradient(135deg,#1E3A8A_0%,#2D55CC_100%)] shadow-[0_10px_22px_rgba(30,58,138,0.35)]">
+            <span className="text-sm font-semibold text-white">A</span>
           </div>
           {/* Admin info - hidden when collapsed */}
           {!collapsed && (
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-[#111827] truncate">Admin User</p>
-              <p className="text-xs text-[#6B7280] truncate">admin@humbingo.com</p>
+              <p className="truncate text-sm font-semibold text-white">Admin User</p>
+              <p className="truncate text-xs text-blue-100/60">admin@humbingo.com</p>
             </div>
           )}
         </div>
         {/* Logout button - hidden when collapsed */}
         {!collapsed && (
-          <button onClick={handleLogout} className="w-full flex items-center gap-2 px-3 py-2 mt-2 text-[#6B7280] hover:text-[#EF4444] hover:bg-[#FEF2F2] rounded-lg transition-colors">
+          <button onClick={handleLogout} className="mt-2 flex w-full items-center gap-2 rounded-2xl px-3 py-2.5 text-blue-100/72 transition-colors hover:bg-red-500/12 hover:text-red-200">
             <LogOut className="w-4 h-4" />
             <span className="text-sm font-medium">Logout</span>
           </button>

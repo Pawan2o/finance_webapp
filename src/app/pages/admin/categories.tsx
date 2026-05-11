@@ -2,6 +2,9 @@
 import { useEffect, useState, useCallback } from 'react';
 import { Layout } from '../../components/Layout';
 import { Loader } from '../../components/Loader';
+import { Input } from '../../components/ui/input';
+import { Button } from '../../components/ui/button';
+import { uiTheme } from '../../../Theme/uiTheme';
 import config from '../../../config/global.json';
 import { apiRequest } from '../../../utils/api';
 import { Plus, Edit, Trash2, X, ChevronLeft, ChevronRight } from 'lucide-react';
@@ -169,14 +172,11 @@ export function Categories() {
       <div className="bg-white rounded-xl p-6 shadow-sm">
         {/* Header with Add Category button */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
-          <h2 className="text-xl font-semibold text-gray-800">Category Management</h2>
-          <button
-            onClick={() => setShowModal(true)}
-            className="flex items-center justify-center gap-2 px-4 py-2 bg-[#374151] text-white rounded-lg hover:bg-[#4B5563] w-full sm:w-auto"
-          >
+          <h2 className={uiTheme.text.sectionTitle}>Category Management</h2>
+          <Button onClick={() => setShowModal(true)} className="w-full sm:w-auto rounded-lg">
             <Plus className="w-4 h-4" />
             Add Category
-          </button>
+          </Button>
         </div>
 
         {/* Categories Table */}
@@ -292,7 +292,7 @@ export function Categories() {
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50" onClick={() => setShowModal(false)}>
           <div className="bg-white rounded-xl p-6 max-w-md w-full mx-4" onClick={(e) => e.stopPropagation()}>
             <div className="flex justify-between items-center mb-4">
-              <h3 className="text-lg font-semibold">{editingCategory ? 'Edit Category' : 'Add Category'}</h3>
+              <h3 className={uiTheme.text.modalTitle}>{editingCategory ? 'Edit Category' : 'Add Category'}</h3>
               <button onClick={() => { setShowModal(false); setError(''); }}>
                 <X className="w-5 h-5 text-gray-500" />
               </button>
@@ -307,11 +307,11 @@ export function Categories() {
               {/* Category name field */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Name</label>
-                <input
+                <Input
                   type="text"
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  className="w-full px-3 py-2 border rounded-lg"
+                  className="rounded-lg border-slate-200 bg-white"
                   required
                 />
               </div>
@@ -322,7 +322,7 @@ export function Categories() {
                 <select
                   value={formData.type}
                   onChange={(e) => setFormData({ ...formData, type: e.target.value })}
-                  className="w-full px-3 py-2 border rounded-lg"
+                  className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none transition-[border-color,box-shadow] focus:border-ring focus:ring-[3px] focus:ring-ring/50"
                   required
                 >
                   <option value="">Select Type</option>
@@ -338,11 +338,11 @@ export function Categories() {
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Material Icon</label>
                 <div className="flex items-center gap-2">
-                  <input
+                  <Input
                     type="text"
                     value={formData.material_icon}
                     onChange={(e) => setFormData({ ...formData, material_icon: e.target.value })}
-                    className="flex-1 px-3 py-2 border rounded-lg"
+                    className="flex-1 rounded-lg border-slate-200 bg-white"
                     placeholder="e.g., home, shopping_cart, account_balance"
                   />
                   {formData.material_icon && (
@@ -358,19 +358,20 @@ export function Categories() {
 
               {/* Form action buttons */}
               <div className="flex flex-col sm:flex-row gap-2 pt-4">
-                <button
+                <Button
                   type="submit"
-                  className="px-4 py-2 bg-[#374151] text-white rounded-lg hover:bg-[#4B5563]"
+                  className="rounded-lg"
                 >
                   {editingCategory ? 'Update' : 'Create'}
-                </button>
-                <button
+                </Button>
+                <Button
                   type="button"
+                  variant="outline"
                   onClick={() => setShowModal(false)}
-                  className="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300"
+                  className="rounded-lg"
                 >
                   Cancel
-                </button>
+                </Button>
               </div>
             </form>
           </div>

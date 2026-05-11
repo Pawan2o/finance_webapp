@@ -5,6 +5,7 @@ import { Input } from '../../components/ui/input';
 import { Button } from '../../components/ui/button';
 import { Label } from '../../components/ui/label';
 import config from '../../../config/global.json';
+import { getAuthToken } from '../../../utils/auth';
 
 interface AuditLog {
   id: number;
@@ -62,7 +63,7 @@ export function AuditLogs() {
   const modules = ['Category', 'Transaction', 'PaymentMethod', 'Type', 'Budget', 'SavingsGoals', 'RecurringTransaction'];
 
   const checkAuth = () => {
-    const token = localStorage.getItem('token');
+    const token = getAuthToken();
     if (!token) {
       window.location.href = '/';
       return false;
@@ -75,7 +76,7 @@ export function AuditLogs() {
 
     setLoading(true);
     try {
-      const token = localStorage.getItem('token');
+      const token = getAuthToken();
       let url = `${config.api.host}${config.api.auditLog}?page=${page}`;
       
       if (debouncedSearchTerm) url += `&search=${encodeURIComponent(debouncedSearchTerm)}`;
@@ -143,7 +144,7 @@ export function AuditLogs() {
     
     setLoading(true);
     try {
-      const token = localStorage.getItem('token');
+      const token = getAuthToken();
       const response = await fetch(`${config.api.host}${config.api.auditLog}cleanup/?days=${deleteDays}&dry_run=false`, {
         method: 'DELETE',
         headers: {
@@ -172,7 +173,7 @@ export function AuditLogs() {
     
     setLoading(true);
     try {
-      const token = localStorage.getItem('token');
+      const token = getAuthToken();
       const response = await fetch(`${config.api.host}${config.api.auditLog}${id}/`, {
         method: 'DELETE',
         headers: {
@@ -231,7 +232,7 @@ export function AuditLogs() {
     
     setLoading(true);
     try {
-      const token = localStorage.getItem('token');
+      const token = getAuthToken();
       const response = await fetch(`${config.api.host}${config.api.auditLog}${log.id}/`, {
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -302,15 +303,16 @@ export function AuditLogs() {
       searchPlaceholder="Search by user, module..."
     >
       <div className="p-6">
-        <div className="flex items-center justify-between mb-6">
+        <div className="mb-6 flex items-center justify-between rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
           <div>
-            <h1 className="text-2xl font-semibold text-[#111827]">Audit Logs</h1>
-            <p className="text-[#6B7280] mt-1">Track all system activities and changes</p>
+            <h1 className="text-2xl font-semibold text-slate-950">Audit Logs</h1>
+            <p className="mt-1 text-slate-700">Track all system activities and changes</p>
           </div>
           <div className="flex items-center space-x-3">
             <Button
               onClick={() => setShowDeleteModal(true)}
-              className="flex items-center space-x-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+              variant="destructive"
+              className="flex items-center space-x-2 rounded-lg px-4 py-2"
             >
               <Trash2 className="w-4 h-4" />
               <span>Delete Old Logs</span>

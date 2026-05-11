@@ -7,6 +7,7 @@ import { Label } from '../../components/ui/label';
 import { Button } from '../../components/ui/button';
 import { User, Edit, Save, X } from 'lucide-react';
 import config from '../../../config/global.json';
+import { clearStoredAuth, getAuthToken, redirectToLogin } from '../../../utils/auth';
 
 interface AdminData {
   id: string;
@@ -54,10 +55,10 @@ export function Profile() {
   // Fetch admin profile data
   const fetchProfile = async () => {
     try {
-      const token = localStorage.getItem('token');
+      const token = getAuthToken();
       
       if (!token) {
-        setError('No authentication token found');
+        redirectToLogin();
         return;
       }
 
@@ -81,8 +82,7 @@ export function Profile() {
       if (!response.ok) {
         if (response.status === 401) {
           setError('Authentication failed. Please login again.');
-          localStorage.removeItem('token');
-          localStorage.removeItem('refresh');
+          clearStoredAuth();
           return;
         }
         throw new Error(`API Error ${response.status}`);
@@ -125,7 +125,12 @@ export function Profile() {
     }
 
     try {
-      const token = localStorage.getItem('token');
+      const token = getAuthToken();
+      if (!token) {
+        redirectToLogin();
+        return;
+      }
+
       const updateData: any = {
         username: formData.username,
         email: formData.email,
@@ -227,7 +232,7 @@ export function Profile() {
             {!isEditing && (
               <Button
                 onClick={() => setIsEditing(true)}
-                className="flex items-center gap-2 bg-[#374151] hover:bg-[#4B5563]"
+                className="flex items-center gap-2 rounded-lg"
               >
                 <Edit className="w-4 h-4" />
                 Edit Profile
@@ -260,6 +265,7 @@ export function Profile() {
                   value={formData.username}
                   onChange={(e) => setFormData(prev => ({ ...prev, username: e.target.value }))}
                   disabled={!isEditing}
+                  className={!isEditing ? "border-slate-200 bg-slate-50 text-slate-900 disabled:opacity-100" : "border-slate-200 bg-white text-slate-900"}
                   required
                 />
               </div>
@@ -273,6 +279,7 @@ export function Profile() {
                   value={formData.email}
                   onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
                   disabled={!isEditing}
+                  className={!isEditing ? "border-slate-200 bg-slate-50 text-slate-900 disabled:opacity-100" : "border-slate-200 bg-white text-slate-900"}
                   required
                 />
               </div>
@@ -286,6 +293,7 @@ export function Profile() {
                   value={formData.first_name}
                   onChange={(e) => setFormData(prev => ({ ...prev, first_name: e.target.value }))}
                   disabled={!isEditing}
+                  className={!isEditing ? "border-slate-200 bg-slate-50 text-slate-900 disabled:opacity-100" : "border-slate-200 bg-white text-slate-900"}
                   required
                 />
               </div>
@@ -299,6 +307,7 @@ export function Profile() {
                   value={formData.last_name}
                   onChange={(e) => setFormData(prev => ({ ...prev, last_name: e.target.value }))}
                   disabled={!isEditing}
+                  className={!isEditing ? "border-slate-200 bg-slate-50 text-slate-900 disabled:opacity-100" : "border-slate-200 bg-white text-slate-900"}
                   required
                 />
               </div>
@@ -317,6 +326,7 @@ export function Profile() {
                       value={formData.password}
                       onChange={(e) => setFormData(prev => ({ ...prev, password: e.target.value }))}
                       placeholder="Leave blank to keep current password"
+                      className="border-slate-200 bg-white text-slate-900"
                     />
                   </div>
 
@@ -328,6 +338,7 @@ export function Profile() {
                       value={formData.confirmPassword}
                       onChange={(e) => setFormData(prev => ({ ...prev, confirmPassword: e.target.value }))}
                       placeholder="Confirm new password"
+                      className="border-slate-200 bg-white text-slate-900"
                     />
                   </div>
                 </div>
@@ -341,7 +352,7 @@ export function Profile() {
               <div className="flex gap-3 pt-6 border-t">
                 <Button
                   type="submit"
-                  className="flex items-center gap-2 bg-green-600 hover:bg-green-700"
+                  className="flex items-center gap-2 rounded-lg"
                 >
                   <Save className="w-4 h-4" />
                   Save Changes
@@ -349,8 +360,9 @@ export function Profile() {
                 
                 <Button
                   type="button"
+                  variant="outline"
                   onClick={handleCancel}
-                  className="flex items-center gap-2 bg-gray-500 hover:bg-gray-600"
+                  className="flex items-center gap-2 rounded-lg"
                 >
                   <X className="w-4 h-4" />
                   Cancel

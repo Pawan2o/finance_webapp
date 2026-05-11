@@ -35,7 +35,13 @@ export function Layout({ children, pageTitle, onSearch, searchPlaceholder }: Lay
   }, [location.pathname]);
 
   return (
-    <div className="min-h-screen bg-[#F9FAFB]">
+    <div className="min-h-screen overflow-x-hidden text-foreground">
+      <div className="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
+        <div className="absolute -left-20 top-16 h-64 w-64 rounded-full bg-[radial-gradient(circle,_rgba(45,85,204,0.24),_transparent_68%)] blur-2xl" />
+        <div className="absolute right-0 top-0 h-72 w-72 rounded-full bg-[radial-gradient(circle,_rgba(124,58,237,0.18),_transparent_65%)] blur-3xl" />
+        <div className="absolute bottom-0 left-1/3 h-80 w-80 rounded-full bg-[radial-gradient(circle,_rgba(36,72,172,0.12),_transparent_70%)] blur-3xl" />
+      </div>
+
       {/* Sidebar - Desktop (hidden on mobile) */}
       <div className="hidden lg:block fixed left-0 top-0 h-screen z-40">
         <Sidebar
@@ -51,11 +57,11 @@ export function Layout({ children, pageTitle, onSearch, searchPlaceholder }: Lay
         <div className="fixed inset-0 z-50 lg:hidden">
           {/* Dark overlay background */}
           <div 
-            className="absolute inset-0 bg-black/50"
+            className="absolute inset-0 bg-slate-950/55 backdrop-blur-sm"
             onClick={() => setMobileMenuOpen(false)}
           ></div>
           {/* Sidebar for mobile */}
-          <div className="relative">
+          <div className="relative max-w-[86vw]">
             <Sidebar
               collapsed={false}
               onToggle={() => setMobileMenuOpen(false)}
@@ -70,7 +76,7 @@ export function Layout({ children, pageTitle, onSearch, searchPlaceholder }: Lay
       )}
 
       {/* Main Content Area - adjusts margin based on sidebar state */}
-      <div className={cn('transition-all duration-300', sidebarCollapsed ? 'lg:ml-16' : 'lg:ml-60')}>
+      <div className={cn('transition-all duration-300', sidebarCollapsed ? 'lg:ml-20' : 'lg:ml-60')}>
         {/* Header with page title and search */}
         <Header
           pageTitle={pageTitle}
@@ -79,7 +85,9 @@ export function Layout({ children, pageTitle, onSearch, searchPlaceholder }: Lay
           searchPlaceholder={searchPlaceholder}
         />
         {/* Page content */}
-        <main className="p-4 md:p-6">{children}</main>
+        <main className="px-4 pb-6 pt-4 md:px-6 md:pb-8 md:pt-5">
+          <div className="mx-auto max-w-[1600px]">{children}</div>
+        </main>
       </div>
     </div>
   );

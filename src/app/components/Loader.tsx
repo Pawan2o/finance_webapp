@@ -21,7 +21,7 @@ export function Loader({ size = 250, className = '', fullScreen = false }: Loade
         const lottie = (await import('lottie-web')).default;
         
         // Import the animation data
-        const animationData = await import('../../assets/Payment Processing.json');
+        const animationData = await import('../../assets/loading/Rupee Coin.json');
         
         if (containerRef.current) {
           animationInstance = lottie.loadAnimation({
@@ -49,7 +49,7 @@ export function Loader({ size = 250, className = '', fullScreen = false }: Loade
 
   if (fullScreen) {
     return (
-      <div className="fixed inset-0 bg-white/80 backdrop-blur-sm flex items-center justify-center z-50">
+      <div className="fixed inset-0 bg-background/80 backdrop-blur-sm flex items-center justify-center z-50">
         <div className="text-center">
           <div 
             className="flex items-center justify-center"
@@ -60,14 +60,14 @@ export function Loader({ size = 250, className = '', fullScreen = false }: Loade
               style={{ width: '100%', height: '100%' }}
             />
           </div>
-          <p className="mt-2 text-gray-600">Loading...</p>
+          <p className="mt-2 text-muted-foreground">Loading...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-white">
+    <div className="fixed inset-0 flex items-center justify-center bg-background">
       <div className="text-center">
         <div 
           className={`mx-auto ${className}`}
@@ -78,7 +78,7 @@ export function Loader({ size = 250, className = '', fullScreen = false }: Loade
             style={{ width: '100%', height: '100%' }}
           />
         </div>
-        <p className="mt-4 text-gray-600 text-lg">Loading...</p>
+        <p className="mt-4 text-muted-foreground text-lg">Loading...</p>
       </div>
     </div>
   );

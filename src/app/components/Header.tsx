@@ -1,5 +1,5 @@
 // Header component - displays page title, search bar, notifications, and user profile
-import { Search, Bell, ChevronDown, User, Settings as SettingsIcon, LogOut, Menu } from 'lucide-react';
+import { Search, ChevronDown, User, Settings as SettingsIcon, LogOut, Menu } from 'lucide-react';
 import { useNavigate } from 'react-router';
 import { clearStoredAuth } from '../../utils/auth';
 
@@ -24,73 +24,72 @@ export function Header({ pageTitle, onMenuClick, onSearch, searchPlaceholder }: 
     navigate('/profile');
   };
   return (
-    <header className="h-16 bg-white border-b border-[#E5E7EB] flex items-center justify-between px-4 md:px-6 sticky top-0 z-30">
+    <header className="sticky top-0 z-30 px-4 pt-4 md:px-6 md:pt-5">
+      <div className="mx-auto flex h-[76px] max-w-[1600px] items-center justify-between rounded-[26px] border border-white/65 bg-white/82 px-4 shadow-[0_18px_45px_rgba(15,23,42,0.10)] backdrop-blur-xl md:px-6">
       {/* Left Side - Mobile Menu Button and Page Title */}
       <div className="flex items-center gap-4">
         {/* Mobile Menu Button - only visible on small screens */}
         <button
           onClick={onMenuClick}
-          className="lg:hidden p-2 hover:bg-[#F3F4F6] rounded-lg transition-colors"
+          className="lg:hidden rounded-2xl border border-slate-200/80 bg-slate-50/90 p-2.5 text-slate-600 transition-colors hover:bg-slate-100"
         >
-          <Menu className="w-5 h-5 text-[#6B7280]" />
+          <Menu className="h-5 w-5" />
         </button>
 
-        <h1 className="text-lg md:text-xl font-semibold text-[#111827]">{pageTitle}</h1>
+        <div>
+          <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-slate-600">PaisaTrack Admin</p>
+          <h1 className="text-xl font-semibold text-slate-950 md:text-2xl">{pageTitle}</h1>
+        </div>
       </div>
 
-      {/* Right Side - Search, Notifications, Profile */}
-      <div className="flex items-center gap-4">
+      {/* Right Side - Search and Profile */}
+      <div className="flex items-center gap-3 md:gap-4">
         {/* Search Bar - hidden on mobile */}
-        <div className="hidden md:flex items-center gap-2 bg-[#F9FAFB] border border-[#E5E7EB] rounded-lg px-3 py-2 w-64">
-          <Search className="w-4 h-4 text-[#9CA3AF]" />
+        <div className="hidden w-72 items-center gap-2 rounded-2xl border border-slate-200/80 bg-slate-50/90 px-3.5 py-3 md:flex">
+          <Search className="h-4 w-4 text-slate-500" />
           <input
             type="text"
             placeholder={searchPlaceholder || "Search..."}
             onChange={(e) => onSearch?.(e.target.value)}
-            className="bg-transparent text-sm text-[#111827] placeholder:text-[#9CA3AF] outline-none flex-1"
+            className="flex-1 bg-transparent text-sm text-slate-900 placeholder:text-slate-500 outline-none"
           />
-        </div>
-
-        {/* Notification Bell with indicator */}
-        <div className="relative">
-          <button className="p-2 hover:bg-[#F3F4F6] rounded-lg transition-colors relative">
-            <Bell className="w-5 h-5 text-[#6B7280]" />
-            {/* Red dot indicator for new notifications */}
-            <span className="absolute top-1 right-1 w-2 h-2 bg-[#EF4444] rounded-full"></span>
-          </button>
         </div>
 
         {/* Admin Avatar & Dropdown Menu */}
         <div className="relative group">
-          <button className="flex items-center gap-2 p-2 hover:bg-[#F3F4F6] rounded-lg transition-colors">
-            <div className="w-8 h-8 bg-[#374151] rounded-full flex items-center justify-center">
-              <span className="text-white text-sm font-medium">A</span>
+          <button className="flex items-center gap-3 rounded-2xl border border-slate-200/80 bg-white/90 px-2.5 py-2 transition-colors hover:bg-slate-50">
+            <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-[linear-gradient(135deg,#1E3A8A_0%,#2D55CC_100%)] shadow-[0_10px_24px_rgba(30,58,138,0.35)]">
+              <span className="text-sm font-semibold text-white">A</span>
             </div>
-            <ChevronDown className="w-4 h-4 text-[#6B7280] hidden sm:block" />
+            <div className="hidden text-left sm:block">
+              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-600">Workspace</p>
+              <p className="text-sm font-semibold text-slate-900">Admin</p>
+            </div>
+            <ChevronDown className="hidden h-4 w-4 text-slate-500 sm:block" />
           </button>
 
           {/* Dropdown Menu - appears on hover */}
-          <div className="absolute right-0 mt-2 w-48 bg-white border border-[#E5E7EB] rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all">
+          <div className="invisible absolute right-0 mt-3 w-56 rounded-2xl border border-white/70 bg-white/96 p-2 shadow-[0_24px_60px_rgba(15,23,42,0.16)] opacity-0 backdrop-blur-xl transition-all group-hover:visible group-hover:opacity-100">
             <div className="p-2">
               {/* Profile option */}
               <button 
                 onClick={handleProfileClick}
-                className="w-full flex items-center gap-3 px-3 py-2 text-[#6B7280] hover:bg-[#F3F4F6] rounded-lg transition-colors"
+                className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-slate-600 transition-colors hover:bg-slate-50 hover:text-slate-900"
               >
                 <User className="w-4 h-4" />
                 <span className="text-sm">Profile</span>
               </button>
               {/* Account Settings option */}
-              <button className="w-full flex items-center gap-3 px-3 py-2 text-[#6B7280] hover:bg-[#F3F4F6] rounded-lg transition-colors">
+              <button className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-slate-600 transition-colors hover:bg-slate-50 hover:text-slate-900">
                 <SettingsIcon className="w-4 h-4" />
                 <span className="text-sm">Account Settings</span>
               </button>
               {/* Divider */}
-              <div className="my-1 border-t border-[#E5E7EB]"></div>
+              <div className="my-2 border-t border-slate-200"></div>
               {/* Logout option */}
               <button 
                 onClick={handleLogout}
-                className="w-full flex items-center gap-3 px-3 py-2 text-[#EF4444] hover:bg-[#FEF2F2] rounded-lg transition-colors"
+                className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-red-500 transition-colors hover:bg-red-50"
               >
                 <LogOut className="w-4 h-4" />
                 <span className="text-sm">Logout</span>
@@ -98,6 +97,7 @@ export function Header({ pageTitle, onMenuClick, onSearch, searchPlaceholder }: 
             </div>
           </div>
         </div>
+      </div>
       </div>
     </header>
   );

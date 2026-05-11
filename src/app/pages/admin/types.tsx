@@ -2,6 +2,8 @@
 import { useEffect, useState, useCallback } from 'react';
 import { Layout } from '../../components/Layout';
 import { Loader } from '../../components/Loader';
+import { Input } from '../../components/ui/input';
+import { Button } from '../../components/ui/button';
 import config from '../../../config/global.json';
 import { apiRequest } from '../../../utils/api';
 
@@ -126,23 +128,23 @@ export function Types() {
       {/* Create/Edit Form */}
       <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow p-4 mb-6">
         <div className="flex flex-col sm:flex-row gap-2">
-          <input
+          <Input
             type="text"
             value={name}
             onChange={(e) => setName(e.target.value)}
             placeholder="Type name"
-            className="flex-1 px-3 py-2 border rounded text-sm"
+            className="flex-1 rounded-lg border-slate-200 bg-white"
             required
           />
           <div className="flex gap-2">
-            <button type="submit" className="flex-1 sm:flex-none px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm">
+            <Button type="submit" className="flex-1 sm:flex-none rounded-lg">
               {editId ? 'Update' : 'Create'}
-            </button>
+            </Button>
             {/* Cancel button - only shown when editing */}
             {editId && (
-              <button type="button" onClick={() => { setEditId(null); setName(''); }} className="flex-1 sm:flex-none px-4 py-2 bg-gray-500 text-white rounded text-sm">
+              <Button type="button" variant="outline" className="flex-1 sm:flex-none rounded-lg" onClick={() => { setEditId(null); setName(''); }}>
                 Cancel
-              </button>
+              </Button>
             )}
           </div>
         </div>

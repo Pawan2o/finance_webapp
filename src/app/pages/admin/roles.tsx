@@ -2,6 +2,9 @@
 import { useEffect, useState } from 'react';
 import { Layout } from '../../components/Layout';
 import { Loader } from '../../components/Loader';
+import { Input } from '../../components/ui/input';
+import { Button } from '../../components/ui/button';
+import { uiTheme } from '../../../Theme/uiTheme';
 import config from '../../../config/global.json';
 import { apiRequest } from '../../../utils/api';
 import { Plus, Edit, Trash2, X } from 'lucide-react';
@@ -139,21 +142,21 @@ export function Roles() {
 
   return (
     <Layout pageTitle="Roles">
-      <div className="bg-white rounded-xl p-6 shadow-sm">
+      <div className={uiTheme.surfaces.pageCard}>
         {/* Header with Add Role button */}
         <div className="flex justify-between items-center mb-6">
-          <h2 className="text-xl font-semibold text-gray-800">Role Management</h2>
-          <button
+          <h2 className={uiTheme.text.sectionTitle}>Role Management</h2>
+          <Button
             onClick={() => {
               setEditingRole(null);
               setFormData({ name: '', permissions: [] });
               setShowModal(true);
             }}
-            className="flex items-center gap-2 px-4 py-2 bg-[#374151] text-white rounded-lg hover:bg-[#4B5563]"
+            className={`flex items-center gap-2 ${uiTheme.buttons.primary}`}
           >
             <Plus className="w-4 h-4" />
             Add Role
-          </button>
+          </Button>
         </div>
 
         {/* Roles Table */}
@@ -161,16 +164,16 @@ export function Roles() {
           <table className="w-full">
             <thead className="bg-gray-50 border-b">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Name</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Permissions</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
+                <th className={`px-6 py-3 text-left ${uiTheme.text.tableHead}`}>Name</th>
+                <th className={`px-6 py-3 text-left ${uiTheme.text.tableHead}`}>Permissions</th>
+                <th className={`px-6 py-3 text-left ${uiTheme.text.tableHead}`}>Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y">
               {roles.map((role) => (
                 <tr key={role.id}>
                   <td className="px-6 py-4 text-sm font-medium text-gray-900">{role.name}</td>
-                  <td className="px-6 py-4 text-sm text-gray-500">
+                  <td className={`px-6 py-4 text-sm ${uiTheme.text.bodySubtle}`}>
                     {/* Display permission count */}
                     {Array.isArray(role.permissions) && role.permissions.length > 0
                       ? `${role.permissions.length} permissions assigned`
@@ -195,35 +198,35 @@ export function Roles() {
       {/* Add/Edit Role Modal */}
       {showModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50" onClick={() => setShowModal(false)}>
-          <div className="bg-white rounded-xl p-6 max-w-md w-full mx-4 max-h-[80vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+          <div className={`${uiTheme.surfaces.modal} max-h-[80vh] w-full max-w-md overflow-y-auto mx-4`} onClick={(e) => e.stopPropagation()}>
             <div className="flex justify-between items-center mb-4">
-              <h3 className="text-lg font-semibold">{editingRole ? 'Edit Role' : 'Add Role'}</h3>
+              <h3 className={uiTheme.text.modalTitle}>{editingRole ? 'Edit Role' : 'Add Role'}</h3>
               <button onClick={() => {
                 setShowModal(false);
                 setEditingRole(null);
                 setFormData({ name: '', permissions: [] });
               }}>
-                <X className="w-5 h-5 text-gray-500" />
+                <X className="w-5 h-5 text-slate-600" />
               </button>
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-4">
               {/* Role name field */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Role Name</label>
-                <input
+                <label className={uiTheme.fields.label}>Role Name</label>
+                <Input
                   type="text"
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  className="w-full px-3 py-2 border rounded-lg"
+                  className={uiTheme.fields.input}
                   required
                 />
               </div>
 
               {/* Permissions selection */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Permissions</label>
-                <div className="space-y-2 max-h-48 overflow-y-auto border rounded-lg p-3">
+                <label className={uiTheme.fields.label}>Permissions</label>
+                <div className="max-h-48 space-y-2 overflow-y-auto rounded-lg border border-slate-200 p-3">
                   {permissions.map((perm) => (
                     <div key={perm.id} className="flex items-center gap-2">
                       <input
@@ -231,9 +234,9 @@ export function Roles() {
                         id={`perm-${perm.id}`}
                         checked={formData.permissions.includes(perm.id)}
                         onChange={() => togglePermission(perm.id)}
-                        className="w-4 h-4 rounded border-gray-300"
+                        className={uiTheme.fields.checkbox}
                       />
-                      <label htmlFor={`perm-${perm.id}`} className="text-sm text-gray-700">
+                      <label htmlFor={`perm-${perm.id}`} className="text-sm text-slate-800">
                         {perm.name}
                       </label>
                     </div>
@@ -243,19 +246,20 @@ export function Roles() {
 
               {/* Form action buttons */}
               <div className="flex gap-2 pt-4">
-                <button
+                <Button
                   type="submit"
-                  className="flex-1 px-4 py-2 bg-[#374151] text-white rounded-lg hover:bg-[#4B5563]"
+                  className={`flex-1 ${uiTheme.buttons.primary}`}
                 >
                   {editingRole ? 'Update' : 'Create'}
-                </button>
-                <button
+                </Button>
+                <Button
                   type="button"
+                  variant="outline"
                   onClick={() => setShowModal(false)}
-                  className="flex-1 px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300"
+                  className={`flex-1 ${uiTheme.buttons.secondary}`}
                 >
                   Cancel
-                </button>
+                </Button>
               </div>
             </form>
           </div>

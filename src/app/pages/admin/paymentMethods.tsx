@@ -2,6 +2,9 @@
 import { useEffect, useState, useCallback } from 'react';
 import { Layout } from '../../components/Layout';
 import { Loader } from '../../components/Loader';
+import { Input } from '../../components/ui/input';
+import { Button } from '../../components/ui/button';
+import { uiTheme } from '../../../Theme/uiTheme';
 import config from '../../../config/global.json';
 import { apiRequest } from '../../../utils/api';
 import { Plus, Edit, Trash2, X, CheckSquare, Square } from 'lucide-react';
@@ -145,27 +148,28 @@ export function PaymentMethods() {
 
   return (
     <Layout pageTitle="Payment Methods" onSearch={debouncedSearch} searchPlaceholder="Search payment methods...">
-      <div className="bg-white rounded-xl p-6 shadow-sm">
+      <div className={uiTheme.surfaces.pageCard}>
         {/* Header with Add Payment Method button */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
-          <h2 className="text-xl font-semibold text-gray-800">Payment Method Management</h2>
+          <h2 className={uiTheme.text.sectionTitle}>Payment Method Management</h2>
           <div className="flex gap-2 w-full sm:w-auto">
             {selectedIds.size > 0 && (
-              <button
+              <Button
                 onClick={handleBulkDelete}
-                className="flex items-center justify-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
+                variant="destructive"
+                className={uiTheme.buttons.destructive}
               >
                 <Trash2 className="w-4 h-4" />
                 Delete ({selectedIds.size})
-              </button>
+              </Button>
             )}
-            <button
+            <Button
               onClick={() => setShowModal(true)}
-              className="flex items-center justify-center gap-2 px-4 py-2 bg-[#374151] text-white rounded-lg hover:bg-[#4B5563] flex-1 sm:flex-initial"
+              className={`flex-1 sm:flex-initial ${uiTheme.buttons.primary}`}
             >
               <Plus className="w-4 h-4" />
               Add Payment Method
-            </button>
+            </Button>
           </div>
         </div>
 
@@ -213,10 +217,10 @@ export function PaymentMethods() {
                     }
                   </button>
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Payment Method</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Created</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
+                <th className={`px-6 py-3 text-left ${uiTheme.text.tableHead}`}>Payment Method</th>
+                <th className={`px-6 py-3 text-left ${uiTheme.text.tableHead}`}>Status</th>
+                <th className={`px-6 py-3 text-left ${uiTheme.text.tableHead}`}>Created</th>
+                <th className={`px-6 py-3 text-left ${uiTheme.text.tableHead}`}>Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y">
@@ -237,7 +241,7 @@ export function PaymentMethods() {
                       {method.is_active ? 'Active' : 'Inactive'}
                     </span>
                   </td>
-                  <td className="px-6 py-4 text-sm text-gray-500">{new Date(method.created_at).toLocaleDateString()}</td>
+                  <td className={`px-6 py-4 text-sm ${uiTheme.text.bodySubtle}`}>{new Date(method.created_at).toLocaleDateString()}</td>
                   <td className="px-6 py-4 text-sm">
                     <button onClick={() => handleEdit(method)} className="text-blue-600 hover:text-blue-800 mr-3">
                       <Edit className="w-4 h-4" />
@@ -256,23 +260,23 @@ export function PaymentMethods() {
       {/* Add/Edit Payment Method Modal */}
       {showModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50" onClick={() => setShowModal(false)}>
-          <div className="bg-white rounded-xl p-6 max-w-md w-full mx-4" onClick={(e) => e.stopPropagation()}>
+          <div className={`${uiTheme.surfaces.modal} w-full max-w-md mx-4`} onClick={(e) => e.stopPropagation()}>
             <div className="flex justify-between items-center mb-4">
-              <h3 className="text-lg font-semibold">{editingMethod ? 'Edit Payment Method' : 'Add Payment Method'}</h3>
+              <h3 className={uiTheme.text.modalTitle}>{editingMethod ? 'Edit Payment Method' : 'Add Payment Method'}</h3>
               <button onClick={() => setShowModal(false)}>
-                <X className="w-5 h-5 text-gray-500" />
+                <X className="w-5 h-5 text-slate-600" />
               </button>
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-4">
               {/* Payment method name field */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Payment Method</label>
-                <input
+                <label className={uiTheme.fields.label}>Payment Method</label>
+                <Input
                   type="text"
                   value={formData.payment_method}
                   onChange={(e) => setFormData({ ...formData, payment_method: e.target.value })}
-                  className="w-full px-3 py-2 border rounded-lg"
+                  className={uiTheme.fields.input}
                   placeholder="Card, Cash, UPI, etc."
                   required
                 />
@@ -285,26 +289,27 @@ export function PaymentMethods() {
                   id="is_active"
                   checked={formData.is_active}
                   onChange={(e) => setFormData({ ...formData, is_active: e.target.checked })}
-                  className="w-4 h-4 rounded border-gray-300"
+                  className={uiTheme.fields.checkbox}
                 />
-                <label htmlFor="is_active" className="text-sm font-medium text-gray-700">Active</label>
+                <label htmlFor="is_active" className="text-sm font-medium text-slate-800">Active</label>
               </div>
 
               {/* Form action buttons */}
               <div className="flex flex-col sm:flex-row gap-2 pt-4">
-                <button
+                <Button
                   type="submit"
-                  className="px-4 py-2 bg-[#374151] text-white rounded-lg hover:bg-[#4B5563]"
+                  className={uiTheme.buttons.primary}
                 >
                   {editingMethod ? 'Update' : 'Create'}
-                </button>
-                <button
+                </Button>
+                <Button
                   type="button"
+                  variant="outline"
                   onClick={() => setShowModal(false)}
-                  className="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300"
+                  className={uiTheme.buttons.secondary}
                 >
                   Cancel
-                </button>
+                </Button>
               </div>
             </form>
           </div>

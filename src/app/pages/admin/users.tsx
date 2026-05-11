@@ -3,8 +3,12 @@ import { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router';
 import { Layout } from '../../components/Layout';
 import { Loader } from '../../components/Loader';
+import { Input } from '../../components/ui/input';
+import { Button } from '../../components/ui/button';
+import { uiTheme } from '../../../Theme/uiTheme';
 import config from '../../../config/global.json';
 import { apiRequest } from '../../../utils/api';
+import { getAuthToken } from '../../../utils/auth';
 import { Plus, Edit, Trash2, X, Eye, EyeOff, ChevronLeft, ChevronRight, AlertTriangle } from 'lucide-react';
 
 // User interface definition
@@ -57,7 +61,7 @@ export function Users() {
 
   // Check if user is authenticated
   const checkAuth = () => {
-    const token = localStorage.getItem('token');
+    const token = getAuthToken();
     if (!token) {
       navigate('/');
       return false;
@@ -282,14 +286,11 @@ export function Users() {
       <div className="bg-white rounded-xl p-6 shadow-sm">
         {/* Header with Add User button */}
         <div className="flex justify-between items-center mb-6">
-          <h2 className="text-xl font-semibold text-gray-800">User Management</h2>
-          <button
-            onClick={() => setShowModal(true)}
-            className="flex items-center gap-2 px-4 py-2 bg-[#374151] text-white rounded-lg hover:bg-[#4B5563]"
-          >
+          <h2 className={uiTheme.text.sectionTitle}>User Management</h2>
+          <Button onClick={() => setShowModal(true)} className="rounded-lg">
             <Plus className="w-4 h-4" />
             Add User
-          </button>
+          </Button>
         </div>
 
         {/* Users Table */}
@@ -380,7 +381,7 @@ export function Users() {
               <div className="p-3 bg-red-100 rounded-full">
                 <AlertTriangle className="w-6 h-6 text-red-600" />
               </div>
-              <h3 className="text-lg font-semibold text-gray-900">Permanent Delete User</h3>
+              <h3 className={uiTheme.text.modalTitle}>Permanent Delete User</h3>
             </div>
             
             <div className="mb-6">
@@ -399,21 +400,23 @@ export function Users() {
             </div>
             
             <div className="flex gap-3">
-              <button
+              <Button
                 onClick={handlePermanentDelete}
-                className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 font-medium"
+                variant="destructive"
+                className="flex-1 rounded-lg"
               >
                 Yes, Delete Permanently
-              </button>
-              <button
+              </Button>
+              <Button
                 onClick={() => {
                   setShowPermanentDeleteModal(false);
                   setUserToDelete(null);
                 }}
-                className="flex-1 px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 font-medium"
+                variant="outline"
+                className="flex-1 rounded-lg"
               >
                 Cancel
-              </button>
+              </Button>
             </div>
           </div>
         </div>
@@ -424,7 +427,7 @@ export function Users() {
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50" onClick={handleCloseModal}>
           <div className="bg-white rounded-xl p-6 max-w-md w-full mx-4" onClick={(e) => e.stopPropagation()}>
             <div className="flex justify-between items-center mb-4">
-              <h3 className="text-lg font-semibold">{editingUser ? 'Edit User' : 'Add User'}</h3>
+              <h3 className={uiTheme.text.modalTitle}>{editingUser ? 'Edit User' : 'Add User'}</h3>
               <button onClick={handleCloseModal}>
                 <X className="w-5 h-5 text-gray-500" />
               </button>
@@ -441,11 +444,11 @@ export function Users() {
               {/* Email field */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
-                <input
+                <Input
                   type="email"
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  className="w-full px-3 py-2 border rounded-lg"
+                  className="rounded-lg border-slate-200 bg-white"
                   required
                 />
               </div>
@@ -456,11 +459,11 @@ export function Users() {
                   Password {editingUser && <span className="text-gray-500">(leave empty to keep current)</span>}
                 </label>
                 <div className="relative">
-                  <input
+                  <Input
                     type={showPassword ? "text" : "password"}
                     value={formData.password}
                     onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                    className="w-full px-3 py-2 pr-10 border rounded-lg"
+                    className="rounded-lg border-slate-200 bg-white pr-10"
                     required={!editingUser}
                   />
                   <button
@@ -477,21 +480,21 @@ export function Users() {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">First Name</label>
-                  <input
+                  <Input
                     type="text"
                     value={formData.first_name}
                     onChange={(e) => setFormData({ ...formData, first_name: e.target.value })}
-                    className="w-full px-3 py-2 border rounded-lg"
+                    className="rounded-lg border-slate-200 bg-white"
                     required
                   />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Last Name</label>
-                  <input
+                  <Input
                     type="text"
                     value={formData.last_name}
                     onChange={(e) => setFormData({ ...formData, last_name: e.target.value })}
-                    className="w-full px-3 py-2 border rounded-lg"
+                    className="rounded-lg border-slate-200 bg-white"
                     required
                   />
                 </div>
@@ -500,7 +503,7 @@ export function Users() {
               {/* Contact field */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Contact No</label>
-                <input
+                <Input
                   type="tel"
                   value={formData.contact_no}
                   onChange={(e) => {
@@ -509,7 +512,7 @@ export function Users() {
                       setFormData({ ...formData, contact_no: value });
                     }
                   }}
-                  className="w-full px-3 py-2 border rounded-lg"
+                  className="rounded-lg border-slate-200 bg-white"
                   placeholder="1234567890"
                   maxLength={10}
                   required
@@ -524,11 +527,11 @@ export function Users() {
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Date of Birth {editingUser && <span className="text-gray-500">(leave empty to keep current)</span>}
                 </label>
-                <input
+                <Input
                   type="date"
                   value={formData.date_of_birth}
                   onChange={(e) => setFormData({ ...formData, date_of_birth: e.target.value })}
-                  className="w-full px-3 py-2 border rounded-lg"
+                  className="rounded-lg border-slate-200 bg-white"
                   required={!editingUser}
                 />
               </div>
@@ -548,19 +551,20 @@ export function Users() {
               
               {/* Form action buttons */}
               <div className="flex gap-2 pt-4">
-                <button
+                <Button
                   type="submit"
-                  className="flex-1 px-4 py-2 bg-[#374151] text-white rounded-lg hover:bg-[#4B5563]"
+                  className="flex-1 rounded-lg"
                 >
                   {editingUser ? 'Update' : 'Create'}
-                </button>
-                <button
+                </Button>
+                <Button
                   type="button"
+                  variant="outline"
                   onClick={handleCloseModal}
-                  className="flex-1 px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300"
+                  className="flex-1 rounded-lg"
                 >
                   Cancel
-                </button>
+                </Button>
               </div>
             </form>
           </div>

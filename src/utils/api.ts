@@ -1,11 +1,11 @@
 // API utility for making authenticated HTTP requests with token refresh
 import config from '../config/global.json';
-import { redirectToLogin } from './auth';
+import { getAuthToken, redirectToLogin } from './auth';
 
 // Makes API requests with automatic token refresh on 401 errors
 export const apiRequest = async (url: string, options: RequestInit = {}) => {
   // Get the access token from localStorage
-  const token = localStorage.getItem('token');
+  const token = getAuthToken();
   
   // Prepare headers with authorization token if available
   const headers = {

@@ -2,6 +2,9 @@
 import { useEffect, useState, useCallback } from 'react';
 import { Layout } from '../../components/Layout';
 import { Loader } from '../../components/Loader';
+import { Input } from '../../components/ui/input';
+import { Button } from '../../components/ui/button';
+import { uiTheme } from '../../../Theme/uiTheme';
 import config from '../../../config/global.json';
 import { apiRequest } from '../../../utils/api';
 import { Plus, Edit, Trash2, X, CheckSquare, Square, Power, ChevronLeft, ChevronRight } from 'lucide-react';
@@ -205,35 +208,35 @@ export function AIQuestions() {
 
   return (
     <Layout pageTitle="AI Questions" onSearch={debouncedSearch} searchPlaceholder="Search AI questions...">
-      <div className="bg-white rounded-xl p-6 shadow-sm">
+      <div className={uiTheme.surfaces.pageCard}>
         {/* Header with Add AI Question button */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
-          <h2 className="text-xl font-semibold text-gray-800">AI Questions Management</h2>
+          <h2 className={uiTheme.text.sectionTitle}>AI Questions Management</h2>
           <div className="flex gap-2 w-full sm:w-auto flex-wrap">
             {selectedIds.size > 0 && (
               <>
-                <button onClick={() => handleBulkActivate(true)} className="flex items-center gap-2 px-3 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">
+                <Button onClick={() => handleBulkActivate(true)} className={`flex items-center gap-2 ${uiTheme.buttons.primary}`}>
                   <Power className="w-4 h-4" /> Activate ({selectedIds.size})
-                </button>
-                <button onClick={() => handleBulkActivate(false)} className="flex items-center gap-2 px-3 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700">
+                </Button>
+                <Button onClick={() => handleBulkActivate(false)} className={`flex items-center gap-2 ${uiTheme.buttons.primary}`}>
                   <Power className="w-4 h-4" /> Deactivate ({selectedIds.size})
-                </button>
-                <button onClick={handleBulkDelete} className="flex items-center gap-2 px-3 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700">
+                </Button>
+                <Button onClick={handleBulkDelete} variant="destructive" className={`flex items-center gap-2 ${uiTheme.buttons.destructive}`}>
                   <Trash2 className="w-4 h-4" /> Delete ({selectedIds.size})
-                </button>
+                </Button>
               </>
             )}
-            <button 
+            <Button 
               onClick={() => {
                 setEditingQuestion(null);
                 setFormData({ question: '', category: '', response_template: '', logic_type: '', is_active: true, is_dynamic: true });
                 setError('');
                 setShowModal(true);
               }} 
-              className="flex items-center justify-center gap-2 px-4 py-2 bg-[#374151] text-white rounded-lg hover:bg-[#4B5563] flex-1 sm:flex-initial"
+              className={`flex-1 justify-center gap-2 sm:flex-initial ${uiTheme.buttons.primary}`}
             >
               <Plus className="w-4 h-4" /> Add AI Question
-            </button>
+            </Button>
           </div>
         </div>
 
@@ -286,12 +289,12 @@ export function AIQuestions() {
                     }
                   </button>
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Question</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Category</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Logic Type</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Template</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
+                <th className={`px-6 py-3 text-left ${uiTheme.text.tableHead}`}>Question</th>
+                <th className={`px-6 py-3 text-left ${uiTheme.text.tableHead}`}>Category</th>
+                <th className={`px-6 py-3 text-left ${uiTheme.text.tableHead}`}>Logic Type</th>
+                <th className={`px-6 py-3 text-left ${uiTheme.text.tableHead}`}>Template</th>
+                <th className={`px-6 py-3 text-left ${uiTheme.text.tableHead}`}>Status</th>
+                <th className={`px-6 py-3 text-left ${uiTheme.text.tableHead}`}>Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y">
@@ -313,10 +316,10 @@ export function AIQuestions() {
                     {question.logic_type ? (
                       <span className="px-2 py-1 rounded-full text-xs bg-indigo-100 text-indigo-800">{question.logic_type}</span>
                     ) : (
-                      <span className="text-gray-400">-</span>
+                      <span className="text-slate-600">-</span>
                     )}
                   </td>
-                  <td className="px-6 py-4 text-sm text-gray-600 max-w-md truncate">{question.response_template}</td>
+                  <td className={`max-w-md truncate px-6 py-4 text-sm ${uiTheme.text.bodySubtle}`}>{question.response_template}</td>
                   <td className="px-6 py-4 text-sm">
                     <div className="flex flex-col gap-1">
                       <span className={`px-2 py-1 rounded-full text-xs ${question.is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
@@ -342,7 +345,7 @@ export function AIQuestions() {
         {/* Pagination */}
         {totalPages > 1 && (
           <div className="flex flex-col sm:flex-row items-center justify-between mt-6 gap-4">
-            <div className="text-sm text-gray-600">
+            <div className={`text-sm ${uiTheme.text.bodySubtle}`}>
               Showing {((currentPage - 1) * pageSize) + 1} to {Math.min(currentPage * pageSize, totalCount)} of {totalCount} results
             </div>
             <div className="flex items-center gap-2">
@@ -395,11 +398,11 @@ export function AIQuestions() {
       {/* Add/Edit AI Question Modal */}
       {showModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50" onClick={() => setShowModal(false)}>
-          <div className="bg-white rounded-xl p-6 max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+          <div className={`${uiTheme.surfaces.modal} max-h-[90vh] w-full max-w-2xl overflow-y-auto mx-4`} onClick={(e) => e.stopPropagation()}>
             <div className="flex justify-between items-center mb-4">
-              <h3 className="text-lg font-semibold">{editingQuestion ? 'Edit AI Question' : 'Add AI Question'}</h3>
+              <h3 className={uiTheme.text.modalTitle}>{editingQuestion ? 'Edit AI Question' : 'Add AI Question'}</h3>
               <button onClick={() => setShowModal(false)}>
-                <X className="w-5 h-5 text-gray-500" />
+                <X className="w-5 h-5 text-slate-600" />
               </button>
             </div>
 
@@ -412,12 +415,12 @@ export function AIQuestions() {
 
               {/* Question field */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Question *</label>
-                <input
+                <label className={uiTheme.fields.label}>Question *</label>
+                <Input
                   type="text"
                   value={formData.question}
                   onChange={(e) => setFormData({ ...formData, question: e.target.value })}
-                  className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className={uiTheme.fields.input}
                   placeholder="How much did I spend on food this month?"
                   minLength={10}
                   required
@@ -426,11 +429,11 @@ export function AIQuestions() {
 
               {/* Category field */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Category *</label>
+                <label className={uiTheme.fields.label}>Category *</label>
                 <select
                   value={formData.category}
                   onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                  className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className={uiTheme.fields.select}
                   required
                 >
                   <option value="">Select category</option>
@@ -448,13 +451,13 @@ export function AIQuestions() {
 
               {/* Logic Type field */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className={uiTheme.fields.label}>
                   Logic Type {formData.is_dynamic && <span className="text-red-500">*</span>}
                 </label>
                 <select
                   value={formData.logic_type}
                   onChange={(e) => setFormData({ ...formData, logic_type: e.target.value })}
-                  className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className={uiTheme.fields.select}
                   required={formData.is_dynamic}
                 >
                   <option value="">Select logic type</option>
@@ -464,22 +467,22 @@ export function AIQuestions() {
                   <option value="budget_analysis">Budget Analysis</option>
                   <option value="weekly_summary">Weekly Summary</option>
                 </select>
-                <p className="text-xs text-gray-500 mt-1">Required for dynamic questions</p>
+                <p className={uiTheme.fields.helperText}>Required for dynamic questions</p>
               </div>
 
               {/* Response Template field */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Response Template *</label>
+                <label className={uiTheme.fields.label}>Response Template *</label>
                 <textarea
                   value={formData.response_template}
                   onChange={(e) => setFormData({ ...formData, response_template: e.target.value })}
-                  className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className={uiTheme.fields.textarea}
                   placeholder="You spent ₹{total} in total. {category_data}\n\nYour highest spending was {top_category} with ₹{top_amount}. {advice}"
                   rows={6}
                   minLength={10}
                   required
                 />
-                <p className="text-xs text-gray-500 mt-1">Use placeholders: {'{total}'}, {'{category_data}'}, {'{top_category}'}, {'{top_amount}'}, {'{advice}'}, {'{daily_avg}'}, {'{trend}'}, {'{percentage_change}'}</p>
+                <p className={uiTheme.fields.helperText}>Use placeholders: {'{total}'}, {'{category_data}'}, {'{top_category}'}, {'{top_amount}'}, {'{advice}'}, {'{daily_avg}'}, {'{trend}'}, {'{percentage_change}'}</p>
               </div>
 
               {/* Active and Dynamic status checkboxes */}
@@ -490,9 +493,9 @@ export function AIQuestions() {
                     id="is_active"
                     checked={formData.is_active}
                     onChange={(e) => setFormData({ ...formData, is_active: e.target.checked })}
-                    className="w-4 h-4 rounded border-gray-300"
+                    className={uiTheme.fields.checkbox}
                   />
-                  <label htmlFor="is_active" className="text-sm font-medium text-gray-700">Active</label>
+                  <label htmlFor="is_active" className="text-sm font-medium text-slate-800">Active</label>
                 </div>
                 <div className="flex items-center gap-2">
                   <input
@@ -500,29 +503,30 @@ export function AIQuestions() {
                     id="is_dynamic"
                     checked={formData.is_dynamic}
                     onChange={(e) => setFormData({ ...formData, is_dynamic: e.target.checked })}
-                    className="w-4 h-4 rounded border-gray-300"
+                    className={uiTheme.fields.checkbox}
                   />
-                  <label htmlFor="is_dynamic" className="text-sm font-medium text-gray-700">Dynamic (Processes user data)</label>
+                  <label htmlFor="is_dynamic" className="text-sm font-medium text-slate-800">Dynamic (Processes user data)</label>
                 </div>
               </div>
 
               {/* Form action buttons */}
               <div className="flex flex-col sm:flex-row gap-2 pt-4">
-                <button
+                <Button
                   type="submit"
                   disabled={submitting}
-                  className="px-4 py-2 bg-[#374151] text-white rounded-lg hover:bg-[#4B5563] disabled:opacity-50 disabled:cursor-not-allowed"
+                  className={uiTheme.buttons.primary}
                 >
                   {submitting ? 'Saving...' : editingQuestion ? 'Update' : 'Create'}
-                </button>
-                <button
+                </Button>
+                <Button
                   type="button"
+                  variant="outline"
                   onClick={() => setShowModal(false)}
                   disabled={submitting}
-                  className="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 disabled:opacity-50"
+                  className={uiTheme.buttons.secondary}
                 >
                   Cancel
-                </button>
+                </Button>
               </div>
             </form>
           </div>
