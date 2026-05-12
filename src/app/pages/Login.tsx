@@ -1,7 +1,6 @@
 // Login page component - handles admin authentication
 import { useState } from 'react';
 import { useNavigate } from 'react-router';
-import { IndianRupee } from 'lucide-react';
 import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
 import { Button } from '../components/ui/button';
@@ -71,35 +70,40 @@ export function Login() {
   };
 
   return (
-    <div className="min-h-screen bg-white flex items-center justify-center p-4">
-      <div className="w-full max-w-[380px] bg-white rounded-2xl shadow-[0_6px_20px_rgba(0,0,0,0.05)] p-8">
+    <div className="min-h-screen flex items-center justify-center p-4" style={{ background: 'var(--background)' }}>
+      {/* Background glow orbs */}
+      <div className="fixed top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
+        <div className="absolute -top-40 -left-40 w-96 h-96 rounded-full opacity-20" style={{ background: 'radial-gradient(circle, #2D55CC, transparent 70%)' }} />
+        <div className="absolute -bottom-40 -right-40 w-96 h-96 rounded-full opacity-10" style={{ background: 'radial-gradient(circle, #3B6AEA, transparent 70%)' }} />
+      </div>
+
+      <div className="w-full max-w-[400px] rounded-3xl p-8 border relative z-10" style={{ background: 'var(--card)', borderColor: 'var(--border)', boxShadow: 'var(--shadow-xl, 0 20px 60px rgba(15,23,42,0.12))' }}>
 
         {/* Logo */}
-        <div className="flex items-center justify-center gap-2 mb-8">
-          <div className="w-10 h-10 bg-[#374151] rounded-xl flex items-center justify-center">
-            <IndianRupee className="w-6 h-6 text-white" />
+        <div className="flex items-center justify-center gap-3 mb-8">
+          <div
+            className="w-11 h-11 rounded-2xl flex items-center justify-center text-white font-bold text-lg"
+            style={{ background: 'linear-gradient(140deg, #0D1E5C 0%, #2448AC 60%, #3B6AEA 100%)', boxShadow: 'var(--shadow-brand)' }}
+          >
+            P
           </div>
-          <span className="text-2xl font-semibold text-[#111827]">
-            PaisaTrack
-          </span>
+          <span className="text-2xl font-extrabold tracking-tight" style={{ color: 'var(--foreground)' }}>PaisaTrack</span>
         </div>
 
-        <h2 className="text-center text-xl font-semibold text-[#111827] mb-6">
-          Admin Login
-        </h2>
+        <h2 className="text-center text-xl font-extrabold tracking-tight mb-1" style={{ color: 'var(--foreground)' }}>Welcome back</h2>
+        <p className="text-center text-sm font-medium mb-7" style={{ color: 'var(--muted-foreground)' }}>Sign in to your admin account</p>
 
-        <form onSubmit={handleLogin} className="space-y-5">
+        <form onSubmit={handleLogin} className="space-y-4">
 
           {error && (
-            <div className="text-red-600 text-sm text-center">
+            <div className="text-sm text-center font-semibold px-4 py-3 rounded-xl border" style={{ color: 'var(--destructive)', background: 'rgba(239,68,68,0.08)', borderColor: 'rgba(239,68,68,0.2)' }}>
               {error}
             </div>
           )}
 
           {/* Username */}
-          <div className="space-y-2">
-            <Label htmlFor="username">Username</Label>
-
+          <div className="space-y-1.5">
+            <Label htmlFor="username" className="text-xs font-bold uppercase tracking-widest" style={{ color: 'var(--muted-foreground)' }}>Username</Label>
             <Input
               id="username"
               type="text"
@@ -107,12 +111,14 @@ export function Login() {
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               required
+              className="rounded-xl h-12 font-medium"
+              style={{ background: 'var(--input-background)', borderColor: 'var(--input)' }}
             />
           </div>
 
           {/* Password */}
-          <div className="space-y-2">
-            <Label htmlFor="password">Password</Label>
+          <div className="space-y-1.5">
+            <Label htmlFor="password" className="text-xs font-bold uppercase tracking-widest" style={{ color: 'var(--muted-foreground)' }}>Password</Label>
             <Input
               id="password"
               type="password"
@@ -121,6 +127,8 @@ export function Login() {
               onChange={(e) => setPassword(e.target.value)}
               required
               minLength={6}
+              className="rounded-xl h-12 font-medium"
+              style={{ background: 'var(--input-background)', borderColor: 'var(--input)' }}
             />
           </div>
 
@@ -128,22 +136,13 @@ export function Login() {
           <Button
             type="submit"
             disabled={loading}
-            className="w-full bg-[#374151] text-white py-2.5 rounded-lg hover:bg-[#4B5563] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            className="w-full h-12 rounded-xl text-white font-bold text-sm disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 mt-2"
+            style={{ background: 'linear-gradient(135deg, var(--primary), #3B6AEA)', boxShadow: 'var(--shadow-brand)' }}
           >
-            {loading ? (
-              <>
-                <Loader size={20} />
-                <span>Logging in...</span>
-              </>
-            ) : (
-              'Login'
-            )}
+            {loading ? (<><Loader size={20} /><span>Signing in...</span></>) : 'Sign In'}
           </Button>
 
-          <p className="text-center text-xs text-[#9CA3AF] mt-4">
-            Secure Admin Access
-          </p>
-
+          <p className="text-center text-xs font-semibold mt-4" style={{ color: 'var(--muted-foreground)' }}>🔒 Secure Admin Access</p>
         </form>
       </div>
     </div>

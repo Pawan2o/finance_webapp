@@ -67,18 +67,17 @@ export function Loader({ size = 250, className = '', fullScreen = false }: Loade
   }
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-white">
+    <div className="flex items-center justify-center" style={{ minHeight: '200px' }}>
       <div className="text-center">
-        <div 
+        <div
           className={`mx-auto ${className}`}
           style={{ width: size, height: size }}
         >
-          <div 
+          <div
             ref={containerRef}
             style={{ width: '100%', height: '100%' }}
           />
         </div>
-        <p className="mt-4 text-gray-600 text-lg">Loading...</p>
       </div>
     </div>
   );

@@ -1,7 +1,7 @@
 {
   "api": {
     "host_": "http://api-paisatrack.humbingo.in",
-    "host": "http://192.168.1.13:8001",
+    "host": "http://192.168.29.234:8000",
     "token": "/auth/token/",
     "path": "/api/v1",
     "refreshToken": "/auth/token/refresh/",

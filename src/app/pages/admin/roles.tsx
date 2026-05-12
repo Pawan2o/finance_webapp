@@ -1,265 +1,129 @@
-// Roles management page - CRUD operations for roles and permissions
 import { useEffect, useState } from 'react';
 import { Layout } from '../../components/Layout';
 import { Loader } from '../../components/Loader';
+import { Modal, ActionButtons, PageHeader, DataTable, rowBg, FormField, StyledInput, ModalActions } from '../../components/shared';
+import { styles } from '../../../app/constants/styles';
 import config from '../../../config/global.json';
 import { apiRequest } from '../../../utils/api';
-import { Plus, Edit, Trash2, X } from 'lucide-react';
+import { Plus, Shield } from 'lucide-react';
 
-// Permission interface definition
-interface Permission {
-  id: number;
-  name: string;
-}
+interface Permission { id: number; name: string; }
+interface Role { id: number; name: string; permissions: Permission[]; }
 
-// Role interface definition
-interface Role {
-  id: number;
-  name: string;
-  permissions: Permission[]; // Array of assigned permissions
-}
+const emptyForm = { name: '', permissions: [] as number[] };
 
-// Roles management component
 export function Roles() {
-  // State management
   const [roles, setRoles] = useState<Role[]>([]);
   const [permissions, setPermissions] = useState<Permission[]>([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [editingRole, setEditingRole] = useState<Role | null>(null);
-  const [formData, setFormData] = useState({ name: '', permissions: [] as number[] });
+  const [formData, setFormData] = useState(emptyForm);
 
-  // Fetch roles from API
   const fetchRoles = async () => {
-    try {
-      const res = await apiRequest(`${config.api.host}${config.api.role}`);
-      const data = await res.json();
-      console.log('Roles data:', data);
-      setRoles(data.results || []);
-    } catch (error) {
-      console.error('Failed to fetch roles:', error);
-    } finally {
-      setLoading(false);
-    }
+    try { const res = await apiRequest(`${config.api.host}${config.api.role}`); const data = await res.json(); setRoles(data.results || []); }
+    catch { console.error('Failed to fetch roles'); }
+    finally { setLoading(false); }
   };
 
-  // Fetch all permissions with pagination support
   const fetchPermissions = async () => {
     try {
-      let allPermissions: Permission[] = [];
-      let url = `${config.api.host}${config.api.permission}`;
-      
-      // Loop through paginated results
-      while (url) {
-        const res = await apiRequest(url);
-        const data = await res.json();
-        allPermissions = [...allPermissions, ...(data.results || [])];
-        url = data.next; // Get next page URL
-      }
-      
-      setPermissions(allPermissions);
-    } catch (error) {
-      console.error('Failed to fetch permissions:', error);
-    }
+      let all: Permission[] = [];
+      let url: string | null = `${config.api.host}${config.api.permission}`;
+      while (url) { const res = await apiRequest(url); const data = await res.json(); all = [...all, ...(data.results || [])]; url = data.next; }
+      setPermissions(all);
+    } catch { console.error('Failed to fetch permissions'); }
   };
 
-  // Fetch data on component mount
-  useEffect(() => {
-    fetchRoles();
-    fetchPermissions();
-  }, []);
+  useEffect(() => { fetchRoles(); fetchPermissions(); }, []);
 
-  // Handle form submission for create/update
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const url = editingRole
-      ? `${config.api.host}${config.api.role}${editingRole.id}/`
-      : `${config.api.host}${config.api.role}`;
-    const method = editingRole ? 'PATCH' : 'POST';
-
-    try {
-      await apiRequest(url, {
-        method,
-        body: JSON.stringify(formData)
-      });
-      // Close modal and refresh list
-      setShowModal(false);
-      setEditingRole(null);
-      setFormData({ name: '', permissions: [] });
-      fetchRoles();
-    } catch (error) {
-      console.error('Failed to save role:', error);
-    }
+    const url = editingRole ? `${config.api.host}${config.api.role}${editingRole.id}/` : `${config.api.host}${config.api.role}`;
+    try { await apiRequest(url, { method: editingRole ? 'PATCH' : 'POST', body: JSON.stringify(formData) }); closeModal(); fetchRoles(); }
+    catch { console.error('Failed to save role'); }
   };
 
-  // Handle role deletion
   const handleDelete = async (id: number) => {
-    if (!confirm('Are you sure?')) return;
-    try {
-      await apiRequest(`${config.api.host}${config.api.role}${id}/`, { method: 'DELETE' });
-      fetchRoles();
-    } catch (error) {
-      console.error('Failed to delete role:', error);
-    }
+    if (!confirm('Delete this role?')) return;
+    try { await apiRequest(`${config.api.host}${config.api.role}${id}/`, { method: 'DELETE' }); fetchRoles(); }
+    catch { console.error('Delete failed'); }
   };
 
-  // Populate form with role data for editing
   const handleEdit = (role: Role) => {
     setEditingRole(role);
-    console.log('Editing role:', role);
-    // Extract permission IDs from role
-    const permissionIds = Array.isArray(role.permissions) 
-      ? role.permissions.map(p => typeof p === 'number' ? p : p.id).filter(Boolean)
-      : [];
-    console.log('Permission IDs:', permissionIds);
-    setFormData({ name: role.name, permissions: permissionIds });
+    const ids = Array.isArray(role.permissions) ? role.permissions.map(p => typeof p === 'number' ? p : p.id).filter(Boolean) : [];
+    setFormData({ name: role.name, permissions: ids });
     setShowModal(true);
   };
 
-  // Toggle permission selection in form
-  const togglePermission = (permId: number) => {
-    setFormData(prev => ({
-      ...prev,
-      permissions: prev.permissions.includes(permId)
-        ? prev.permissions.filter(id => id !== permId) // Remove if already selected
-        : [...prev.permissions, permId] // Add if not selected
-    }));
-  };
+  const togglePermission = (id: number) => setFormData(prev => ({
+    ...prev,
+    permissions: prev.permissions.includes(id) ? prev.permissions.filter(p => p !== id) : [...prev.permissions, id],
+  }));
 
-  // Show loading state
-  if (loading) {
-    return (
-      <Layout pageTitle="Roles">
-        <div className="flex items-center justify-center py-16">
-          <Loader size={120} />
-        </div>
-      </Layout>
-    );
-  }
+  const closeModal = () => { setShowModal(false); setEditingRole(null); setFormData(emptyForm); };
+
+  if (loading) return <Layout pageTitle="Roles"><div className="flex items-center justify-center py-16"><Loader size={120} /></div></Layout>;
+
+  const columns = [{ key: 'name', label: 'Role Name' }, { key: 'perms', label: 'Permissions' }, { key: 'actions', label: 'Actions' }];
 
   return (
     <Layout pageTitle="Roles">
-      <div className="bg-white rounded-xl p-6 shadow-sm">
-        {/* Header with Add Role button */}
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-xl font-semibold text-gray-800">Role Management</h2>
-          <button
-            onClick={() => {
-              setEditingRole(null);
-              setFormData({ name: '', permissions: [] });
-              setShowModal(true);
-            }}
-            className="flex items-center gap-2 px-4 py-2 bg-[#374151] text-white rounded-lg hover:bg-[#4B5563]"
-          >
-            <Plus className="w-4 h-4" />
-            Add Role
-          </button>
-        </div>
+      <div className="rounded-2xl border p-6" style={styles.card}>
+        <PageHeader
+          title="Role Management"
+          subtitle={`${roles.length} roles defined`}
+          actions={
+            <button onClick={() => { closeModal(); setShowModal(true); }} className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold transition-all hover:-translate-y-0.5" style={styles.btnPrimary}>
+              <Plus className="w-4 h-4" /> Add Role
+            </button>
+          }
+        />
 
-        {/* Roles Table */}
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead className="bg-gray-50 border-b">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Name</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Permissions</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y">
-              {roles.map((role) => (
-                <tr key={role.id}>
-                  <td className="px-6 py-4 text-sm font-medium text-gray-900">{role.name}</td>
-                  <td className="px-6 py-4 text-sm text-gray-500">
-                    {/* Display permission count */}
-                    {Array.isArray(role.permissions) && role.permissions.length > 0
-                      ? `${role.permissions.length} permissions assigned`
-                      : 'No permissions assigned'
-                    }
-                  </td>
-                  <td className="px-6 py-4 text-sm">
-                    <button onClick={() => handleEdit(role)} className="text-blue-600 hover:text-blue-800 mr-3">
-                      <Edit className="w-4 h-4" />
-                    </button>
-                    <button onClick={() => handleDelete(role.id)} className="text-red-600 hover:text-red-800">
-                      <Trash2 className="w-4 h-4" />
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        <DataTable
+          columns={columns}
+          emptyMessage="No roles found"
+          rows={roles.map((role, i) => (
+            <tr key={role.id} style={rowBg(i)}>
+              <td className={`${styles.td} font-semibold`} style={{ color: 'var(--foreground)' }}>
+                <div className="flex items-center gap-2">
+                  <div className="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0" style={{ background: 'var(--accent)' }}>
+                    <Shield className="w-3.5 h-3.5" style={{ color: 'var(--primary)' }} />
+                  </div>
+                  {role.name}
+                </div>
+              </td>
+              <td className={styles.td}>
+                <span className="px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wide" style={{ background: 'var(--accent)', color: 'var(--accent-foreground)' }}>
+                  {Array.isArray(role.permissions) && role.permissions.length > 0 ? `${role.permissions.length} assigned` : 'None'}
+                </span>
+              </td>
+              <td className={styles.td}><ActionButtons onEdit={() => handleEdit(role)} onDelete={() => handleDelete(role.id)} /></td>
+            </tr>
+          ))}
+        />
       </div>
 
-      {/* Add/Edit Role Modal */}
       {showModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50" onClick={() => setShowModal(false)}>
-          <div className="bg-white rounded-xl p-6 max-w-md w-full mx-4 max-h-[80vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
-            <div className="flex justify-between items-center mb-4">
-              <h3 className="text-lg font-semibold">{editingRole ? 'Edit Role' : 'Add Role'}</h3>
-              <button onClick={() => {
-                setShowModal(false);
-                setEditingRole(null);
-                setFormData({ name: '', permissions: [] });
-              }}>
-                <X className="w-5 h-5 text-gray-500" />
-              </button>
-            </div>
-
-            <form onSubmit={handleSubmit} className="space-y-4">
-              {/* Role name field */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Role Name</label>
-                <input
-                  type="text"
-                  value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  className="w-full px-3 py-2 border rounded-lg"
-                  required
-                />
+        <Modal title={editingRole ? 'Edit Role' : 'Add Role'} onClose={closeModal}>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <FormField label="Role Name">
+              <StyledInput type="text" value={formData.name} onChange={e => setFormData({ ...formData, name: e.target.value })} required />
+            </FormField>
+            <FormField label={`Permissions (${formData.permissions.length} selected)`}>
+              <div className="max-h-48 overflow-y-auto rounded-xl border p-3 space-y-1.5" style={{ borderColor: 'var(--border)', background: 'var(--muted)' }}>
+                {permissions.map(perm => (
+                  <label key={perm.id} className="flex items-center gap-2.5 cursor-pointer py-0.5">
+                    <input type="checkbox" checked={formData.permissions.includes(perm.id)} onChange={() => togglePermission(perm.id)} className="rounded" />
+                    <span className="text-xs font-medium" style={{ color: 'var(--foreground)' }}>{perm.name}</span>
+                  </label>
+                ))}
               </div>
-
-              {/* Permissions selection */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Permissions</label>
-                <div className="space-y-2 max-h-48 overflow-y-auto border rounded-lg p-3">
-                  {permissions.map((perm) => (
-                    <div key={perm.id} className="flex items-center gap-2">
-                      <input
-                        type="checkbox"
-                        id={`perm-${perm.id}`}
-                        checked={formData.permissions.includes(perm.id)}
-                        onChange={() => togglePermission(perm.id)}
-                        className="w-4 h-4 rounded border-gray-300"
-                      />
-                      <label htmlFor={`perm-${perm.id}`} className="text-sm text-gray-700">
-                        {perm.name}
-                      </label>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Form action buttons */}
-              <div className="flex gap-2 pt-4">
-                <button
-                  type="submit"
-                  className="flex-1 px-4 py-2 bg-[#374151] text-white rounded-lg hover:bg-[#4B5563]"
-                >
-                  {editingRole ? 'Update' : 'Create'}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setShowModal(false)}
-                  className="flex-1 px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300"
-                >
-                  Cancel
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
+            </FormField>
+            <ModalActions onCancel={closeModal} submitLabel={editingRole ? 'Update' : 'Create'} />
+          </form>
+        </Modal>
       )}
     </Layout>
   );
