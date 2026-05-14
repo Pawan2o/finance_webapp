@@ -1,6 +1,8 @@
 import { RouterProvider } from 'react-router';
-import { router } from './config/routes';
+import { useAppTheme } from '../Theme/useAppTheme';
+import { router } from './routes';
 
 export default function App() {
+  useAppTheme();
   return <RouterProvider router={router} />;
 }

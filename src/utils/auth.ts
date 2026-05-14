@@ -7,3 +7,7 @@ export function redirectToLogin() {
   clearStoredAuth();
   window.location.href = '/';
 }
+
+export function getAuthToken() {
+  return localStorage.getItem('token');
+}

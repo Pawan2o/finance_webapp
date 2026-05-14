@@ -1,5 +1,6 @@
-// Loader component - displays Payment Processing animation
+// Loader component - displays Rupee Coin animation
 import { useEffect, useRef } from 'react';
+import animationData from '../../assets/loading/Rupee Coin.json';
 
 // Props interface for Loader component
 interface LoaderProps {
@@ -17,19 +18,15 @@ export function Loader({ size = 250, className = '', fullScreen = false }: Loade
 
     const loadLottie = async () => {
       try {
-        // Dynamically import lottie-web to avoid SSR issues
         const lottie = (await import('lottie-web')).default;
-        
-        // Import the animation data
-        const animationData = await import('../../assets/Payment Processing.json');
-        
+
         if (containerRef.current) {
           animationInstance = lottie.loadAnimation({
             container: containerRef.current,
             renderer: 'svg',
             loop: true,
             autoplay: true,
-            animationData: animationData.default,
+            animationData,
           });
         }
       } catch (error) {
@@ -49,7 +46,7 @@ export function Loader({ size = 250, className = '', fullScreen = false }: Loade
 
   if (fullScreen) {
     return (
-      <div className="fixed inset-0 bg-white/80 backdrop-blur-sm flex items-center justify-center z-50">
+      <div className="fixed inset-0 bg-background/80 backdrop-blur-sm flex items-center justify-center z-50">
         <div className="text-center">
           <div 
             className="flex items-center justify-center"
@@ -60,7 +57,7 @@ export function Loader({ size = 250, className = '', fullScreen = false }: Loade
               style={{ width: '100%', height: '100%' }}
             />
           </div>
-          <p className="mt-2 text-gray-600">Loading...</p>
+          <p className="mt-2 text-muted-foreground">Loading...</p>
         </div>
       </div>
     );

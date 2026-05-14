@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react';
+import { CheckSquare, Plus, Square, Trash2 } from 'lucide-react';
 import { Layout } from '../../components/Layout';
 import { Loader } from '../../components/Loader';
-import { Modal, StatusBadge, ActionButtons, PageHeader, DataTable, rowBg, FormField, StyledInput, FormError, ModalActions } from '../../components/shared';
+import { ActionButtons, DataTable, FormField, Modal, ModalActions, PageHeader, rowBg, StatusBadge, StyledInput } from '../../components/shared';
+import { useDebounce } from '../../hooks/useDebounce';
 import { styles } from '../../../app/constants/styles';
 import config from '../../../config/global.json';
 import { apiRequest } from '../../../utils/api';
-import { useDebounce } from '../../hooks/useDebounce';
-import { Plus, Trash2, CheckSquare, Square } from 'lucide-react';
 
 interface PaymentMethod { id: string; payment_method: string; is_active: boolean; created_at: string; }
 
@@ -27,51 +27,89 @@ export function PaymentMethods() {
       const res = await apiRequest(url);
       const data = await res.json();
       setPaymentMethods(data.results || []);
-    } catch { console.error('Failed to fetch payment methods'); }
-    finally { setLoading(false); }
+    } catch {
+      console.error('Failed to fetch payment methods');
+    } finally {
+      setLoading(false);
+    }
   };
 
-  useEffect(() => { fetchPaymentMethods(); }, []);
+  useEffect(() => {
+    fetchPaymentMethods();
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const url = editingMethod ? `${config.api.host}${config.api.paymentMethod}${editingMethod.id}/` : `${config.api.host}${config.api.paymentMethod}`;
     try {
       await apiRequest(url, { method: editingMethod ? 'PUT' : 'POST', body: JSON.stringify(formData) });
-      closeModal(); fetchPaymentMethods(searchQuery);
-    } catch { console.error('Failed to save'); }
+      closeModal();
+      fetchPaymentMethods(searchQuery);
+    } catch {
+      console.error('Failed to save');
+    }
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Delete this payment method?')) return;
-    try { await apiRequest(`${config.api.host}${config.api.paymentMethod}${id}/`, { method: 'DELETE' }); fetchPaymentMethods(searchQuery); }
-    catch { console.error('Delete failed'); }
+    if (!confirm('Delete this payment method?')) {
+      return;
+    }
+    try {
+      await apiRequest(`${config.api.host}${config.api.paymentMethod}${id}/`, { method: 'DELETE' });
+      fetchPaymentMethods(searchQuery);
+    } catch {
+      console.error('Delete failed');
+    }
   };
 
   const handleBulkDelete = async () => {
-    if (!confirm(`Delete ${selectedIds.size} items?`)) return;
+    if (!confirm(`Delete ${selectedIds.size} items?`)) {
+      return;
+    }
     try {
-      await Promise.all(Array.from(selectedIds).map(id => apiRequest(`${config.api.host}${config.api.paymentMethod}${id}/`, { method: 'DELETE' })));
-      setSelectedIds(new Set()); fetchPaymentMethods(searchQuery);
-    } catch { console.error('Bulk delete failed'); }
+      await Promise.all(Array.from(selectedIds).map((id) => apiRequest(`${config.api.host}${config.api.paymentMethod}${id}/`, { method: 'DELETE' })));
+      setSelectedIds(new Set());
+      fetchPaymentMethods(searchQuery);
+    } catch {
+      console.error('Bulk delete failed');
+    }
   };
 
-  const toggleSelect = (id: string) => setSelectedIds(prev => { const n = new Set(prev); n.has(id) ? n.delete(id) : n.add(id); return n; });
-  const toggleSelectAll = () => setSelectedIds(prev => prev.size === paymentMethods.length ? new Set() : new Set(paymentMethods.map(m => m.id)));
+  const toggleSelect = (id: string) => setSelectedIds((prev) => {
+    const next = new Set(prev);
+    next.has(id) ? next.delete(id) : next.add(id);
+    return next;
+  });
 
-  const handleEdit = (method: PaymentMethod) => { setEditingMethod(method); setFormData({ payment_method: method.payment_method, is_active: method.is_active }); setShowModal(true); };
-  const closeModal = () => { setShowModal(false); setEditingMethod(null); setFormData(emptyForm); };
+  const toggleSelectAll = () => setSelectedIds((prev) => (prev.size === paymentMethods.length ? new Set() : new Set(paymentMethods.map((m) => m.id))));
 
-  const debouncedSearch = useDebounce((q) => { setSearchQuery(q); fetchPaymentMethods(q); });
+  const handleEdit = (method: PaymentMethod) => {
+    setEditingMethod(method);
+    setFormData({ payment_method: method.payment_method, is_active: method.is_active });
+    setShowModal(true);
+  };
 
-  if (loading) return <Layout pageTitle="Payment Methods"><div className="flex items-center justify-center py-16"><Loader size={120} /></div></Layout>;
+  const closeModal = () => {
+    setShowModal(false);
+    setEditingMethod(null);
+    setFormData(emptyForm);
+  };
+
+  const debouncedSearch = useDebounce((q) => {
+    setSearchQuery(q);
+    fetchPaymentMethods(q);
+  });
+
+  if (loading) {
+    return <Layout pageTitle="Payment Methods"><div className="flex items-center justify-center py-16"><Loader size={120} /></div></Layout>;
+  }
 
   const allSelected = selectedIds.size === paymentMethods.length && paymentMethods.length > 0;
   const columns = [{ key: 'method', label: 'Payment Method' }, { key: 'status', label: 'Status' }, { key: 'created', label: 'Created' }, { key: 'actions', label: 'Actions' }];
 
   const selectAllBtn = (
     <button onClick={toggleSelectAll}>
-      {allSelected ? <CheckSquare className="w-4 h-4" style={{ color: 'var(--primary)' }} /> : <Square className="w-4 h-4" style={{ color: 'var(--muted-foreground)' }} />}
+      {allSelected ? <CheckSquare className="h-4 w-4" style={{ color: 'var(--primary)' }} /> : <Square className="h-4 w-4" style={{ color: 'var(--muted-foreground)' }} />}
     </button>
   );
 
@@ -84,31 +122,30 @@ export function PaymentMethods() {
           actions={
             <>
               {selectedIds.size > 0 && (
-                <button onClick={handleBulkDelete} className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold text-white transition-all hover:-translate-y-0.5" style={styles.btnDanger}>
-                  <Trash2 className="w-4 h-4" /> Delete ({selectedIds.size})
+                <button onClick={handleBulkDelete} className="flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-bold text-white transition-all hover:-translate-y-0.5" style={styles.btnDanger}>
+                  <Trash2 className="h-4 w-4" /> Delete ({selectedIds.size})
                 </button>
               )}
-              <button onClick={() => setShowModal(true)} className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold transition-all hover:-translate-y-0.5 flex-1 sm:flex-initial justify-center" style={styles.btnPrimary}>
-                <Plus className="w-4 h-4" /> Add Method
+              <button onClick={() => setShowModal(true)} className="flex flex-1 items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-bold transition-all hover:-translate-y-0.5 sm:flex-initial" style={styles.btnPrimary}>
+                <Plus className="h-4 w-4" /> Add Method
               </button>
             </>
           }
         />
 
-        {/* Mobile */}
-        <div className="block sm:hidden space-y-2">
-          {paymentMethods.map(method => (
-            <div key={method.id} className="p-4 rounded-xl border" style={{ borderColor: 'var(--border)', background: 'var(--muted)' }}>
-              <div className="flex justify-between items-start">
+        <div className="block space-y-2 sm:hidden">
+          {paymentMethods.map((method) => (
+            <div key={method.id} className="rounded-xl border p-4" style={{ borderColor: 'var(--border)', background: 'var(--muted)' }}>
+              <div className="flex items-start justify-between">
                 <div className="flex items-center gap-2">
                   <button onClick={() => toggleSelect(method.id)}>
-                    {selectedIds.has(method.id) ? <CheckSquare className="w-5 h-5" style={{ color: 'var(--primary)' }} /> : <Square className="w-5 h-5" style={{ color: 'var(--muted-foreground)' }} />}
+                    {selectedIds.has(method.id) ? <CheckSquare className="h-5 w-5" style={{ color: 'var(--primary)' }} /> : <Square className="h-5 w-5" style={{ color: 'var(--muted-foreground)' }} />}
                   </button>
                   <p className="text-sm font-bold" style={{ color: 'var(--foreground)' }}>{method.payment_method}</p>
                 </div>
                 <ActionButtons onEdit={() => handleEdit(method)} onDelete={() => handleDelete(method.id)} />
               </div>
-              <div className="flex items-center gap-2 mt-2 ml-7">
+              <div className="ml-7 mt-2 flex items-center gap-2">
                 <StatusBadge active={method.is_active} />
                 <span className="text-xs" style={{ color: 'var(--muted-foreground)' }}>{new Date(method.created_at).toLocaleDateString()}</span>
               </div>
@@ -116,7 +153,6 @@ export function PaymentMethods() {
           ))}
         </div>
 
-        {/* Desktop */}
         <div className="hidden sm:block">
           <DataTable
             columns={columns}
@@ -126,7 +162,7 @@ export function PaymentMethods() {
               <tr key={method.id} style={rowBg(i)}>
                 <td className="px-5 py-3.5">
                   <button onClick={() => toggleSelect(method.id)}>
-                    {selectedIds.has(method.id) ? <CheckSquare className="w-4 h-4" style={{ color: 'var(--primary)' }} /> : <Square className="w-4 h-4" style={{ color: 'var(--muted-foreground)' }} />}
+                    {selectedIds.has(method.id) ? <CheckSquare className="h-4 w-4" style={{ color: 'var(--primary)' }} /> : <Square className="h-4 w-4" style={{ color: 'var(--muted-foreground)' }} />}
                   </button>
                 </td>
                 <td className={`${styles.td} font-semibold`} style={{ color: 'var(--foreground)' }}>{method.payment_method}</td>
@@ -143,10 +179,10 @@ export function PaymentMethods() {
         <Modal title={editingMethod ? 'Edit Method' : 'Add Payment Method'} onClose={closeModal}>
           <form onSubmit={handleSubmit} className="space-y-4">
             <FormField label="Payment Method">
-              <StyledInput type="text" value={formData.payment_method} onChange={e => setFormData({ ...formData, payment_method: e.target.value })} placeholder="Card, Cash, UPI, etc." required />
+              <StyledInput type="text" value={formData.payment_method} onChange={(e) => setFormData({ ...formData, payment_method: e.target.value })} placeholder="Card, Cash, UPI, etc." required />
             </FormField>
-            <label className="flex items-center gap-2.5 cursor-pointer">
-              <input type="checkbox" checked={formData.is_active} onChange={e => setFormData({ ...formData, is_active: e.target.checked })} className="rounded" />
+            <label className="flex cursor-pointer items-center gap-2.5">
+              <input type="checkbox" checked={formData.is_active} onChange={(e) => setFormData({ ...formData, is_active: e.target.checked })} className="rounded" />
               <span className="text-sm font-semibold" style={{ color: 'var(--foreground)' }}>Active</span>
             </label>
             <ModalActions onCancel={closeModal} submitLabel={editingMethod ? 'Update' : 'Create'} />
