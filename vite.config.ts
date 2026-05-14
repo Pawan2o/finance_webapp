@@ -16,6 +16,20 @@ export default defineConfig({
       '@': path.resolve(__dirname, './src'),
     },
   },
+  server: {
+    proxy: {
+      '/auth': {
+        target: 'https://finance-backend-0bbu.onrender.com',
+        changeOrigin: true,
+        secure: true,
+      },
+      '/api': {
+        target: 'https://finance-backend-0bbu.onrender.com',
+        changeOrigin: true,
+        secure: true,
+      },
+    },
+  },
 
   // File types to support raw imports. Never add .css, .tsx, or .ts files to this.
   assetsInclude: ['**/*.svg', '**/*.csv'],

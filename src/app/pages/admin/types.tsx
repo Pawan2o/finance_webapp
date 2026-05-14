@@ -3,7 +3,7 @@ import { Edit, Plus, Trash2, X } from 'lucide-react';
 import { Layout } from '../../components/Layout';
 import { Loader } from '../../components/Loader';
 import config from '../../../config/global.json';
-import { apiRequest } from '../../../utils/api';
+import { apiRequest, apiUrl } from '../../../utils/api';
 
 interface Category { id: string; name: string; }
 interface Type { id: string; name: string; created_at: string; updated_at: string; categories: Category[]; }
@@ -24,7 +24,7 @@ export function Types() {
 
   const fetchTypes = async (search = '') => {
     try {
-      const url = search ? `${config.api.host}${config.api.type}?search=${encodeURIComponent(search)}` : `${config.api.host}${config.api.type}`;
+      const url = search ? apiUrl(`${config.api.type}?search=${encodeURIComponent(search)}`) : apiUrl(config.api.type);
       const res = await apiRequest(url);
       const data: TypesResponse = await res.json();
       setTypes(data.results || []);
@@ -41,7 +41,7 @@ export function Types() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const url = editId ? `${config.api.host}${config.api.type}${editId}/` : `${config.api.host}${config.api.type}`;
+    const url = editId ? apiUrl(`${config.api.type}${editId}/`) : apiUrl(config.api.type);
     try {
       await apiRequest(url, { method: editId ? 'PUT' : 'POST', body: JSON.stringify({ name }) });
       setName('');
@@ -62,7 +62,7 @@ export function Types() {
       return;
     }
     try {
-      await apiRequest(`${config.api.host}${config.api.type}${id}/`, { method: 'DELETE' });
+      await apiRequest(apiUrl(`${config.api.type}${id}/`), { method: 'DELETE' });
       fetchTypes(searchQuery);
     } catch {
       console.error('Delete failed');

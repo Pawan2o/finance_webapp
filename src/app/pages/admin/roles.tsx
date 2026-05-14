@@ -5,7 +5,7 @@ import { Loader } from '../../components/Loader';
 import { ActionButtons, DataTable, FormField, Modal, ModalActions, PageHeader, rowBg, StyledInput } from '../../components/shared';
 import { styles } from '../../../app/constants/styles';
 import config from '../../../config/global.json';
-import { apiRequest } from '../../../utils/api';
+import { apiRequest, apiUrl } from '../../../utils/api';
 
 interface Permission { id: number; name: string; }
 interface Role { id: number; name: string; permissions: Permission[]; }
@@ -22,7 +22,7 @@ export function Roles() {
 
   const fetchRoles = async () => {
     try {
-      const res = await apiRequest(`${config.api.host}${config.api.role}`);
+      const res = await apiRequest(apiUrl(config.api.role));
       const data = await res.json();
       setRoles(data.results || []);
     } catch {
@@ -35,7 +35,7 @@ export function Roles() {
   const fetchPermissions = async () => {
     try {
       let all: Permission[] = [];
-      let url: string | null = `${config.api.host}${config.api.permission}`;
+      let url: string | null = apiUrl(config.api.permission);
       while (url) {
         const res = await apiRequest(url);
         const data = await res.json();
@@ -55,7 +55,7 @@ export function Roles() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const url = editingRole ? `${config.api.host}${config.api.role}${editingRole.id}/` : `${config.api.host}${config.api.role}`;
+    const url = editingRole ? apiUrl(`${config.api.role}${editingRole.id}/`) : apiUrl(config.api.role);
     try {
       await apiRequest(url, { method: editingRole ? 'PATCH' : 'POST', body: JSON.stringify(formData) });
       closeModal();
@@ -70,7 +70,7 @@ export function Roles() {
       return;
     }
     try {
-      await apiRequest(`${config.api.host}${config.api.role}${id}/`, { method: 'DELETE' });
+      await apiRequest(apiUrl(`${config.api.role}${id}/`), { method: 'DELETE' });
       fetchRoles();
     } catch {
       console.error('Delete failed');

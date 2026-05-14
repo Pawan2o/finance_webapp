@@ -7,6 +7,7 @@ import { Loader } from '../components/Loader';
 import { PageCard } from '../components/PageCard';
 import config from '../../config/global.json';
 import { getAuthToken, redirectToLogin } from '../../utils/auth';
+import { apiUrl } from '../../utils/api';
 
 // Dashboard component showing key statistics
 export function Dashboard() {
@@ -29,7 +30,7 @@ export function Dashboard() {
         const headers = { 'Authorization': `Bearer ${token}` };
 
         // Fetch users data
-        const usersRes = await fetch(`${config.api.host}${config.api.user}`, { headers });
+        const usersRes = await fetch(apiUrl(config.api.user), { headers });
         const usersData = await usersRes.json();
 
         // Filter out superusers from total count

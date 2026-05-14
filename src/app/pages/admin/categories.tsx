@@ -6,7 +6,7 @@ import { ActionButtons, DataTable, FormError, FormField, Modal, ModalActions, Pa
 import { useDebounce } from '../../hooks/useDebounce';
 import { styles } from '../../../app/constants/styles';
 import config from '../../../config/global.json';
-import { apiRequest } from '../../../utils/api';
+import { apiRequest, apiUrl } from '../../../utils/api';
 
 interface Type { id: string; name: string; }
 interface Category { id: string; name: string; type: string | Type; material_icon?: string; created_at: string; }
@@ -30,8 +30,8 @@ export function Categories() {
   const fetchCategories = async (search: string, page: number) => {
     try {
       const url = search
-        ? `${config.api.host}${config.api.category}?search=${encodeURIComponent(search)}&page=${page}`
-        : `${config.api.host}${config.api.category}?page=${page}`;
+        ? apiUrl(`${config.api.category}?search=${encodeURIComponent(search)}&page=${page}`)
+        : apiUrl(`${config.api.category}?page=${page}`);
       const res = await apiRequest(url);
       const data: CategoriesResponse = await res.json();
       setCategories(data.results || []);
@@ -45,7 +45,7 @@ export function Categories() {
 
   const fetchTypes = async () => {
     try {
-      const res = await apiRequest(`${config.api.host}${config.api.type}`);
+      const res = await apiRequest(apiUrl(config.api.type));
       const data = await res.json();
       setTypes(data.results || []);
     } catch {
@@ -65,7 +65,7 @@ export function Categories() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
-    const url = editingCategory ? `${config.api.host}${config.api.category}${editingCategory.id}/` : `${config.api.host}${config.api.category}`;
+    const url = editingCategory ? apiUrl(`${config.api.category}${editingCategory.id}/`) : apiUrl(config.api.category);
 
     try {
       const res = await apiRequest(url, { method: editingCategory ? 'PUT' : 'POST', body: JSON.stringify(formData) });
@@ -86,7 +86,7 @@ export function Categories() {
       return;
     }
     try {
-      await apiRequest(`${config.api.host}${config.api.category}${id}/`, { method: 'DELETE' });
+      await apiRequest(apiUrl(`${config.api.category}${id}/`), { method: 'DELETE' });
       fetchCategories(searchQuery, currentPage);
     } catch {
       console.error('Delete failed');

@@ -7,7 +7,7 @@ import { ActionButtons, DataTable, FormError, FormField, Modal, ModalActions, Pa
 import { useDebounce } from '../../hooks/useDebounce';
 import { styles } from '../../../app/constants/styles';
 import config from '../../../config/global.json';
-import { apiRequest } from '../../../utils/api';
+import { apiRequest, apiUrl } from '../../../utils/api';
 
 interface User {
   id: string;
@@ -59,13 +59,13 @@ export function Users() {
       if (search) {
         params.append('search', search);
       }
-      const res = await apiRequest(`${config.api.host}${config.api.user}?${params}`);
+      const res = await apiRequest(apiUrl(`${config.api.user}?${params}`));
       const data: UsersResponse = await res.json();
       const filtered = (data.results || []).filter((u) => !u.is_superuser);
       setUsers(filtered);
       if (page === 1 && !search) {
         try {
-          const all = await apiRequest(`${config.api.host}${config.api.user}?page_size=1000`);
+          const all = await apiRequest(apiUrl(`${config.api.user}?page_size=1000`));
           const allData: UsersResponse = await all.json();
           setTotalCount((allData.results || []).filter((u) => !u.is_superuser).length);
         } catch {
@@ -99,7 +99,7 @@ export function Users() {
       return;
     }
     try {
-      const url = editingUser ? `${config.api.host}${config.api.user}${editingUser.id}/` : `${config.api.host}${config.api.createUser}`;
+      const url = editingUser ? apiUrl(`${config.api.user}${editingUser.id}/`) : apiUrl(config.api.createUser);
       const body = editingUser ? { ...formData, ...(formData.password ? {} : { password: undefined }), date_of_birth: formData.date_of_birth || editingUser.date_of_birth } : formData;
       const res = await apiRequest(url, { method: editingUser ? 'PUT' : 'POST', body: JSON.stringify(body) });
       if (!res.ok) {
@@ -118,7 +118,7 @@ export function Users() {
       return;
     }
     try {
-      await apiRequest(`${config.api.host}${config.api.user}${id}/`, { method: 'DELETE' });
+      await apiRequest(apiUrl(`${config.api.user}${id}/`), { method: 'DELETE' });
       fetchUsers(searchQuery, currentPage);
     } catch {
       console.error('Delete failed');
@@ -130,7 +130,7 @@ export function Users() {
       return;
     }
     try {
-      await apiRequest(`${config.api.host}${config.api.user}${userToDelete.id}/permanent-delete/`, { method: 'DELETE' });
+      await apiRequest(apiUrl(`${config.api.user}${userToDelete.id}/permanent-delete/`), { method: 'DELETE' });
       setShowDeleteModal(false);
       setUserToDelete(null);
       fetchUsers(searchQuery, currentPage);

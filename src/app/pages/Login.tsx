@@ -6,6 +6,7 @@ import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
 import config from '../../config/global.json';
+import { apiUrl } from '../../utils/api';
 
 export function Login() {
   const navigate = useNavigate();
@@ -21,7 +22,7 @@ export function Login() {
     setLoading(true);
 
     try {
-      const tokenRes = await fetch(`${config.api.host}${config.api.token}`, {
+      const tokenRes = await fetch(apiUrl(config.api.token), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, password }),
@@ -34,7 +35,7 @@ export function Login() {
       }
 
       const tokenData = await tokenRes.json();
-      const userRes = await fetch(`${config.api.host}${config.api.isSuperUser}`, {
+      const userRes = await fetch(apiUrl(config.api.isSuperUser), {
         method: 'GET',
         headers: { Authorization: `Bearer ${tokenData.access}` },
       });

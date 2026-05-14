@@ -3,7 +3,7 @@ import { CheckSquare, ChevronLeft, ChevronRight, Edit, Plus, Power, Square, Tras
 import { Layout } from '../../components/Layout';
 import { Loader } from '../../components/Loader';
 import config from '../../../config/global.json';
-import { apiRequest } from '../../../utils/api';
+import { apiRequest, apiUrl } from '../../../utils/api';
 
 interface AIQuestion {
   id: string;
@@ -54,7 +54,7 @@ export function AIQuestions() {
       if (search) params.append('search', search);
       params.append('page', page.toString());
       params.append('page_size', pageSize.toString());
-      const res = await apiRequest(`${config.api.host}${config.api.aiQuestion}?${params}`);
+      const res = await apiRequest(apiUrl(`${config.api.aiQuestion}?${params}`));
       const data = await res.json();
       setAIQuestions(data.results || []);
       setTotalCount(data.count || 0);
@@ -80,7 +80,7 @@ export function AIQuestions() {
       setSubmitting(false);
       return;
     }
-    const url = editingQuestion ? `${config.api.host}${config.api.aiQuestion}${editingQuestion.id}/` : `${config.api.host}${config.api.aiQuestionCreate}`;
+    const url = editingQuestion ? apiUrl(`${config.api.aiQuestion}${editingQuestion.id}/`) : apiUrl(config.api.aiQuestionCreate);
     try {
       const res = await apiRequest(url, { method: editingQuestion ? 'PUT' : 'POST', body: JSON.stringify(formData) });
       if (!res.ok) {
@@ -100,7 +100,7 @@ export function AIQuestions() {
   const handleDelete = async (id: string) => {
     if (!confirm('Delete this question?')) return;
     try {
-      await apiRequest(`${config.api.host}${config.api.aiQuestion}${id}/`, { method: 'DELETE' });
+      await apiRequest(apiUrl(`${config.api.aiQuestion}${id}/`), { method: 'DELETE' });
       fetchAIQuestions(searchQuery, currentPage);
     } catch {
       console.error('Delete failed');
@@ -110,7 +110,7 @@ export function AIQuestions() {
   const handleBulkDelete = async () => {
     if (!confirm(`Delete ${selectedIds.size} items?`)) return;
     try {
-      await Promise.all(Array.from(selectedIds).map((id) => apiRequest(`${config.api.host}${config.api.aiQuestion}${id}/`, { method: 'DELETE' })));
+      await Promise.all(Array.from(selectedIds).map((id) => apiRequest(apiUrl(`${config.api.aiQuestion}${id}/`), { method: 'DELETE' })));
       setSelectedIds(new Set());
       fetchAIQuestions(searchQuery, currentPage);
     } catch {
@@ -120,7 +120,7 @@ export function AIQuestions() {
 
   const handleBulkActivate = async (activate: boolean) => {
     try {
-      await apiRequest(`${config.api.host}${config.api.aiQuestion}bulk_activate/`, { method: 'POST', body: JSON.stringify({ ids: Array.from(selectedIds), is_active: activate }) });
+      await apiRequest(apiUrl(`${config.api.aiQuestion}bulk_activate/`), { method: 'POST', body: JSON.stringify({ ids: Array.from(selectedIds), is_active: activate }) });
       setSelectedIds(new Set());
       fetchAIQuestions(searchQuery, currentPage);
     } catch {

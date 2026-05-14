@@ -2,6 +2,10 @@
 import config from '../config/global.json';
 import { getAuthToken, redirectToLogin } from './auth';
 
+export const API_BASE_URL = import.meta.env.DEV ? '' : (config.api.host_ || config.api.host);
+
+export const apiUrl = (path: string) => `${API_BASE_URL}${path}`;
+
 // Makes API requests with automatic token refresh on 401 errors
 export const apiRequest = async (url: string, options: RequestInit = {}) => {
   // Get the access token from localStorage
@@ -24,7 +28,7 @@ export const apiRequest = async (url: string, options: RequestInit = {}) => {
     if (refreshToken) {
       try {
         // Request a new access token using the refresh token
-        const refreshRes = await fetch(`${config.api.host}${config.api.refreshToken}`, {
+        const refreshRes = await fetch(apiUrl(config.api.refreshToken), {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ refresh: refreshToken })

@@ -3,7 +3,7 @@ import { Edit, Lock, Save, X } from 'lucide-react';
 import { Layout } from '../../components/Layout';
 import { Loader } from '../../components/Loader';
 import config from '../../../config/global.json';
-import { apiRequest } from '../../../utils/api';
+import { apiRequest, apiUrl } from '../../../utils/api';
 
 interface AdminData {
   id: string;
@@ -65,7 +65,7 @@ export function Profile() {
         setLoading(false);
         return;
       }
-      const res = await apiRequest(`${config.api.host}/api/v1/user/${userId}/`);
+      const res = await apiRequest(apiUrl(`/api/v1/user/${userId}/`));
       if (!res.ok) {
         throw new Error(`API Error ${res.status}`);
       }
@@ -96,7 +96,7 @@ export function Profile() {
       if (formData.password) {
         body.password = formData.password;
       }
-      const res = await apiRequest(`${config.api.host}/api/v1/user/${adminData.id}/`, { method: 'PUT', body: JSON.stringify(body) });
+      const res = await apiRequest(apiUrl(`/api/v1/user/${adminData.id}/`), { method: 'PUT', body: JSON.stringify(body) });
       if (!res.ok) {
         throw new Error(`Update failed: ${res.status}`);
       }

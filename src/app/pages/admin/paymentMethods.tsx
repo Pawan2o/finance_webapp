@@ -6,7 +6,7 @@ import { ActionButtons, DataTable, FormField, Modal, ModalActions, PageHeader, r
 import { useDebounce } from '../../hooks/useDebounce';
 import { styles } from '../../../app/constants/styles';
 import config from '../../../config/global.json';
-import { apiRequest } from '../../../utils/api';
+import { apiRequest, apiUrl } from '../../../utils/api';
 
 interface PaymentMethod { id: string; payment_method: string; is_active: boolean; created_at: string; }
 
@@ -23,7 +23,7 @@ export function PaymentMethods() {
 
   const fetchPaymentMethods = async (search = '') => {
     try {
-      const url = search ? `${config.api.host}${config.api.paymentMethod}?search=${encodeURIComponent(search)}` : `${config.api.host}${config.api.paymentMethod}`;
+      const url = search ? apiUrl(`${config.api.paymentMethod}?search=${encodeURIComponent(search)}`) : apiUrl(config.api.paymentMethod);
       const res = await apiRequest(url);
       const data = await res.json();
       setPaymentMethods(data.results || []);
@@ -40,7 +40,7 @@ export function PaymentMethods() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const url = editingMethod ? `${config.api.host}${config.api.paymentMethod}${editingMethod.id}/` : `${config.api.host}${config.api.paymentMethod}`;
+    const url = editingMethod ? apiUrl(`${config.api.paymentMethod}${editingMethod.id}/`) : apiUrl(config.api.paymentMethod);
     try {
       await apiRequest(url, { method: editingMethod ? 'PUT' : 'POST', body: JSON.stringify(formData) });
       closeModal();
@@ -55,7 +55,7 @@ export function PaymentMethods() {
       return;
     }
     try {
-      await apiRequest(`${config.api.host}${config.api.paymentMethod}${id}/`, { method: 'DELETE' });
+      await apiRequest(apiUrl(`${config.api.paymentMethod}${id}/`), { method: 'DELETE' });
       fetchPaymentMethods(searchQuery);
     } catch {
       console.error('Delete failed');
@@ -67,7 +67,7 @@ export function PaymentMethods() {
       return;
     }
     try {
-      await Promise.all(Array.from(selectedIds).map((id) => apiRequest(`${config.api.host}${config.api.paymentMethod}${id}/`, { method: 'DELETE' })));
+      await Promise.all(Array.from(selectedIds).map((id) => apiRequest(apiUrl(`${config.api.paymentMethod}${id}/`), { method: 'DELETE' })));
       setSelectedIds(new Set());
       fetchPaymentMethods(searchQuery);
     } catch {

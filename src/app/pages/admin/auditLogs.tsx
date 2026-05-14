@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { Activity, Calendar, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Eye, Filter, Trash2, User } from 'lucide-react';
 import { Layout } from '../../components/Layout';
 import config from '../../../config/global.json';
+import { apiUrl } from '../../../utils/api';
 
 interface AuditLog {
   id: number;
@@ -69,7 +70,7 @@ export function AuditLogs() {
     setLoading(true);
     try {
       const token = localStorage.getItem('token');
-      let url = `${config.api.host}${config.api.auditLog}?page=${page}`;
+      let url = apiUrl(`${config.api.auditLog}?page=${page}`);
       if (debouncedSearch) url += `&search=${encodeURIComponent(debouncedSearch)}`;
       if (selectedAction) url += `&action=${selectedAction}`;
       if (selectedModule) url += `&module=${selectedModule}`;
@@ -114,7 +115,7 @@ export function AuditLogs() {
     setLoading(true);
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch(`${config.api.host}${config.api.auditLog}cleanup/?days=${deleteDays}&dry_run=false`, { method: 'DELETE', headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' } });
+      const res = await fetch(apiUrl(`${config.api.auditLog}cleanup/?days=${deleteDays}&dry_run=false`), { method: 'DELETE', headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' } });
       if (!res.ok) throw new Error('Failed');
       setToast({ message: `Deleted logs older than ${deleteDays} days`, type: 'success' });
       setShowDeleteModal(false);
@@ -131,7 +132,7 @@ export function AuditLogs() {
     setLoading(true);
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch(`${config.api.host}${config.api.auditLog}${id}/`, { method: 'DELETE', headers: { Authorization: `Bearer ${token}` } });
+      const res = await fetch(apiUrl(`${config.api.auditLog}${id}/`), { method: 'DELETE', headers: { Authorization: `Bearer ${token}` } });
       if (!res.ok) throw new Error('Failed');
       setToast({ message: 'Log deleted', type: 'success' });
       setShowDeleteConfirm(false);
@@ -149,7 +150,7 @@ export function AuditLogs() {
     setLoading(true);
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch(`${config.api.host}${config.api.auditLog}${log.id}/`, { headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' } });
+      const res = await fetch(apiUrl(`${config.api.auditLog}${log.id}/`), { headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' } });
       if (!res.ok) throw new Error('Failed');
       setSelectedLog(await res.json());
       setShowModal(true);
