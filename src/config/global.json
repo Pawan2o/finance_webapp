@@ -1,7 +1,7 @@
 {
   "api": {
-    "host_": "http://api-paisatrack.humbingo.in",
-    "host": "http://192.168.29.234:8000",
+    "host_": "https://finance-backend-0bbu.onrender.com",
+    "host": "https://finance-backend-0bbu.onrender.com",
     "token": "/auth/token/",
     "path": "/api/v1",
     "refreshToken": "/auth/token/refresh/",
