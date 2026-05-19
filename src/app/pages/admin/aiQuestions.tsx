@@ -80,12 +80,18 @@ export function AIQuestions() {
       setSubmitting(false);
       return;
     }
-    const url = editingQuestion ? apiUrl(`${config.api.aiQuestion}${editingQuestion.id}/`) : apiUrl(config.api.aiQuestionCreate);
+    const url = editingQuestion
+      ? apiUrl(`${config.api.aiQuestion}${editingQuestion.id}/`)
+      : apiUrl(config.api.aiQuestion);
     try {
       const res = await apiRequest(url, { method: editingQuestion ? 'PUT' : 'POST', body: JSON.stringify(formData) });
       if (!res.ok) {
-        const d = await res.json();
-        throw new Error(d.error || d.detail || 'Failed to save');
+        let msg = `Request failed (${res.status})`;
+        try {
+          const d = await res.json();
+          msg = d.error || d.detail || d.non_field_errors?.[0] || JSON.stringify(d);
+        } catch { /* response body was not JSON, keep default msg */ }
+        throw new Error(msg);
       }
       closeModal();
       setSelectedIds(new Set());
